@@ -1,0 +1,97 @@
+/* ── Tabs ── */
+"tab.home"       = "Home";
+"tab.lists"      = "My Lists";
+"tab.appearance" = "Appearance";
+"tab.settings"   = "Settings";
+
+/* ── Splash ── */
+"splash.tagline" = "Luck is in your hands";
+
+/* ── Home ── */
+"home.title" = "Chooser 🎲";
+
+/* ── Picker modes ── */
+"mode.fingerChooser.title"    = "Finger Chooser";
+"mode.fingerChooser.subtitle" = "Place multiple fingers, one will be chosen";
+"mode.roulette.title"         = "Roulette";
+"mode.roulette.subtitle"      = "Spin the wheel of destiny";
+"mode.dice.title"             = "Dice";
+"mode.dice.subtitle"          = "Roll one or more dice";
+"mode.randomDraw.title"       = "Random Draw";
+"mode.randomDraw.subtitle"    = "Pick an item from your list";
+"mode.coinFlip.title"         = "Coin Flip";
+"mode.coinFlip.subtitle"      = "Let fate decide";
+"mode.numberRoulette.title"   = "Random Number";
+"mode.numberRoulette.subtitle" = "Pick a number in a defined range";
+"mode.luckyArrow.title"       = "Lucky Arrow";
+"mode.luckyArrow.subtitle"    = "Spin the arrow and let fate decide";
+"mode.weightedRoulette.title"    = "Weighted Wheel";
+"mode.weightedRoulette.subtitle" = "Set your own probabilities";
+
+/* ── My Lists ── */
+"lists.title"             = "My Lists";
+"lists.empty.title"       = "No lists yet";
+"lists.empty.body"        = "Create your first list to use\nit in Roulette or Random Draw!";
+"lists.create"            = "Create a list";
+"lists.new.title"         = "New list";
+"lists.new.nameSection"   = "List name";
+"lists.new.placeholder"   = "e.g. Movies to watch…";
+"lists.item.singular"     = "1 item";
+"lists.item.plural"       = "%d items";
+
+/* ── List detail ── */
+"detail.addPlaceholder"   = "Add an item…";
+"detail.emptyTitle"       = "Empty list";
+"detail.emptyBody"        = "Tap + to add items";
+
+/* ── Settings ── */
+"settings.title"          = "Settings";
+"settings.feedback"       = "Feedback";
+"settings.sound"          = "Sound";
+"settings.haptics"        = "Haptics";
+"settings.preferences"    = "Preferences";
+"settings.defaultMode"    = "Default mode";
+"settings.stats"          = "Statistics";
+"settings.stats.lists"    = "Lists created";
+"settings.stats.items"    = "Total items";
+"settings.danger"         = "Danger zone";
+"settings.reset"          = "Clear all data";
+"settings.reset.footer"   = "Deletes all your lists and items. This action is irreversible.";
+"settings.reset.confirm"  = "Clear all data?";
+"settings.reset.action"   = "Clear all";
+"settings.reset.message"  = "All your lists and items will be permanently deleted.";
+"settings.about"          = "About";
+"settings.version"        = "Version";
+
+/* ── Language ── */
+"settings.language.section" = "Language";
+"settings.language.label"   = "Language";
+"lang.system"               = "Automatic";
+"lang.system.detail"        = "Follows iPhone language";
+"lang.fr"                   = "Français";
+"lang.en"                   = "English";
+
+/* ── Appearance ── */
+"personalization.title"       = "Appearance";
+"appearance.theme"            = "Theme";
+"appearance.theme.footer"     = "Changes the app accent colors.";
+"appearance.roulette"         = "Roulette";
+"appearance.wheelFrame"       = "Wheel frame";
+"appearance.numberStyle"      = "Random Number style";
+"appearance.numberStyle.slot"    = "Slot Machine";
+"appearance.numberStyle.classic" = "Classic";
+"appearance.animations"       = "Animations";
+"appearance.confetti"         = "Confetti";
+"appearance.intensity"        = "Animation intensity";
+"appearance.intensity.light"  = "Light";
+"appearance.intensity.normal" = "Normal";
+"appearance.intensity.intense" = "Intense";
+"appearance.animation.footer" = "Adjust the liveliness of visual effects throughout the app.";
+
+/* ── Buttons ── */
+"button.cancel"  = "Cancel";
+"button.create"  = "Create";
+"button.ok"      = "OK";
+"button.close"   = "Close";
+"button.edit"    = "Edit";
+"button.delete"  = "Delete";

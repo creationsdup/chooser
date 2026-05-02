@@ -1,0 +1,23 @@
+{
+  "/Users/maeldupin/Desktop/Chooser/Chooser/CoinFlipView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/CoinFlipView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/CoinFlipView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/CoinFlipView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/CoinFlipView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/CoinFlipView.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/ContentView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ContentView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ContentView.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/DiceRollView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/DiceRollView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/DiceRollView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/DiceRollView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/DiceRollView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/DiceRollView.swiftdeps"
+  }
+}

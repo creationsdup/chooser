@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Atmos — Vibrant Dark</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; font-family: "Plus Jakarta Sans", -apple-system, system-ui, sans-serif; background: #0B0D14; color: #F5F6FA; -webkit-font-smoothing: antialiased; }
+  body { display: flex; gap: 32px; padding: 32px; flex-wrap: wrap; justify-content: center; }
+  .phone { width: 402px; height: 874px; border-radius: 52px; overflow: hidden; position: relative; background: #000; box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 8px #1a1a1a, 0 0 0 9px #2a2a2a; }
+  .phone .notch { position: absolute; top: 11px; left: 50%; transform: translateX(-50%); width: 126px; height: 37px; border-radius: 24px; background: #000; z-index: 100; }
+  input { font-family: inherit; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+// ═══════════════════════════════════════════════════════════════════
+// ATMOS — VIBRANT DARK
+// Single-file reference implementation. Copy into your project.
+// ═══════════════════════════════════════════════════════════════════
+
+// ────────────── ICONS (Lucide-style, 1.5–2.4 stroke) ──────────────
+const Icon = ({ d, size = 24, color = 'currentColor', stroke = 1.5, fill = 'none' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round">
+    {typeof d === 'string' ? <path d={d} /> : d}
+  </svg>
+);
+
+const Icons = {
+  Hand: (p) => <Icon {...p} d={<g><path d="M9 11V5a2 2 0 1 1 4 0v6"/><path d="M13 9V4a2 2 0 1 1 4 0v9"/><path d="M17 9V6a2 2 0 1 1 4 0v8a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 1 1 2.83-2.82L7 15V5a2 2 0 1 1 4 0v6"/></g>}/>,
+  Roulette: (p) => <Icon {...p} d={<g><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v6M21 12h-6M12 21v-6M3 12h6"/></g>}/>,
+  Wheel: (p) => <Icon {...p} d={<g><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></g>}/>,
+  Dice: (p) => <Icon {...p} d={<g><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8" cy="8" r="1" fill={p.color || 'currentColor'}/><circle cx="16" cy="8" r="1" fill={p.color || 'currentColor'}/><circle cx="12" cy="12" r="1" fill={p.color || 'currentColor'}/><circle cx="8" cy="16" r="1" fill={p.color || 'currentColor'}/><circle cx="16" cy="16" r="1" fill={p.color || 'currentColor'}/></g>}/>,
+  Shuffle: (p) => <Icon {...p} d={<g><path d="M16 3h5v5"/><path d="M4 20L21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></g>}/>,
+  Coin: (p) => <Icon {...p} d={<g><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/></g>}/>,
+  Hash: (p) => <Icon {...p} d={<g><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></g>}/>,
+  Back: (p) => <Icon {...p} d="M15 18l-6-6 6-6"/>,
+  Home: (p) => <Icon {...p} d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2v-9z"/>,
+  List: (p) => <Icon {...p} d={<g><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1" fill={p.color || 'currentColor'}/><circle cx="3.5" cy="12" r="1" fill={p.color || 'currentColor'}/><circle cx="3.5" cy="18" r="1" fill={p.color || 'currentColor'}/></g>}/>,
+  Palette: (p) => <Icon {...p} d={<g><circle cx="13.5" cy="6.5" r="1"/><circle cx="17.5" cy="10.5" r="1"/><circle cx="8.5" cy="7.5" r="1"/><circle cx="6.5" cy="12.5" r="1"/><path d="M12 22a10 10 0 1 1 10-10c0 5-4 5-7 5h-1a2 2 0 0 0-2 2 4 4 0 0 1-4 4 1 1 0 0 1 .5-.6"/></g>}/>,
+  Settings: (p) => <Icon {...p} d={<g><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></g>}/>,
+  Crown: (p) => <Icon {...p} d="M2 8l4 8h12l4-8-5 4-5-7-5 7-5-4z"/>,
+  ChevronRight: (p) => <Icon {...p} d="M9 18l6-6-6-6"/>,
+  Check: (p) => <Icon {...p} d="M5 12l4 4L19 7"/>,
+  Plus: (p) => <Icon {...p} d="M12 5v14M5 12h14"/>,
+  Eye: (p) => <Icon {...p} d={<g><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></g>}/>,
+  Sparkle: (p) => <Icon {...p} d="M12 3l1.5 5.5L19 10l-5.5 1.5L12 17l-1.5-5.5L5 10l5.5-1.5L12 3z"/>,
+};
+
+// ────────────── GAME DEFINITIONS ──────────────
+const GAMES = [
+  { key: 'finger',   title: 'Finger Chooser', sub: 'Place fingers, one is chosen', icon: 'Hand' },
+  { key: 'roulette', title: 'Roulette',        sub: 'Spin the wheel of destiny',     icon: 'Roulette' },
+  { key: 'weighted', title: 'Weighted Wheel',  sub: 'Set your own probabilities',    icon: 'Wheel' },
+  { key: 'dice',     title: 'Dice',            sub: 'Roll one or several dice',      icon: 'Dice' },
+  { key: 'draw',     title: 'Random Draw',     sub: 'Pick from your list',           icon: 'Shuffle' },
+  { key: 'coin',     title: 'Coin Flip',       sub: 'Let fate decide',               icon: 'Coin' },
+  { key: 'number',   title: 'Random Number',   sub: 'A number in your range',        icon: 'Hash' },
+];
+
+// ────────────── VIBRANT DARK THEME ──────────────
+const t = {
+  bg: '#0B0D14',
+  card: '#161A24',
+  cardBorder: 'rgba(255,255,255,0.06)',
+  ink: '#F5F6FA',
+  inkSoft: 'rgba(245,246,250,0.6)',
+  inkFaint: 'rgba(245,246,250,0.32)',
+  primary: '#B89BFF',
+  primarySoft: 'rgba(184,155,255,0.14)',
+};
+
+// Per-game color palettes (for tiles, CTAs, halos)
+const gamePalette = {
+  finger:   { from: '#7B5FE3', to: '#A285FF', glow: '#9B7CFF' },
+  roulette: { from: '#E8556F', to: '#FF8094', glow: '#FF7088' },
+  weighted: { from: '#3A8DE8', to: '#62B0FF', glow: '#62B0FF' },
+  dice:     { from: '#2EA86A', to: '#5DD49B', glow: '#3FCC86' },
+  draw:     { from: '#0EAFAA', to: '#3DD9D5', glow: '#22D3CE' },
+  coin:     { from: '#E89A3A', to: '#FFC97A', glow: '#FFB85C' },
+  number:   { from: '#5957D4', to: '#7977E8', glow: '#7977E8' },
+};
+
+// ────────────── REUSABLE CHROME ──────────────
+function StatusBar() {
+  return (
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '21px 32px 0' }}>
+      <span style={{ fontSize: 17, fontWeight: 600, color: t.ink }}>21:45</span>
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center', opacity: 0.85 }}>
+        <svg width="17" height="11" viewBox="0 0 17 11"><path d="M8.5 2C11 2 13 3 14 4l1-1C13.5 1.5 11 0.5 8.5 0.5S3.5 1.5 2 3l1 1c1-1 3-2 5.5-2zM8.5 5C10 5 11 5.5 12 6.5l1-1c-1.2-1-2.7-1.5-4.5-1.5S5.7 4.5 4.5 5.5l1 1C6.5 5.5 7 5 8.5 5z" fill={t.ink}/><circle cx="8.5" cy="9" r="1.5" fill={t.ink}/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke={t.ink} strokeOpacity="0.4" fill="none"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill={t.ink}/></svg>
+      </div>
+    </div>
+  );
+}
+
+function NavBar({ title, trailing }) {
+  return (
+    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 25, paddingTop: 60, paddingLeft: 16, paddingRight: 16, paddingBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ width: 40, height: 40, borderRadius: 20, background: t.card, border: `1px solid ${t.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.ink }}>
+        <Icons.Back size={18} stroke={2}/>
+      </div>
+      <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: -0.3, color: t.ink }}>{title}</div>
+      <div style={{ minWidth: 40, display: 'flex', justifyContent: 'flex-end' }}>{trailing || <div style={{ width: 40 }}/>}</div>
+    </div>
+  );
+}
+
+function TabBar() {
+  const tabs = [
+    { key: 'home', label: 'Home', icon: 'Home' },
+    { key: 'lists', label: 'Lists', icon: 'List' },
+    { key: 'theme', label: 'Theme', icon: 'Palette' },
+    { key: 'set', label: 'Settings', icon: 'Settings' },
+  ];
+  return (
+    <div style={{ position: 'absolute', bottom: 18, left: 16, right: 16, zIndex: 40, borderRadius: 30, padding: 6, background: 'rgba(25,28,36,0.85)', backdropFilter: 'blur(24px) saturate(180%)', WebkitBackdropFilter: 'blur(24px) saturate(180%)', border: `1px solid ${t.cardBorder}`, boxShadow: '0 12px 40px rgba(0,0,0,0.5)', display: 'flex', gap: 4 }}>
+      {tabs.map((tab, i) => {
+        const IconC = Icons[tab.icon];
+        const isA = i === 0;
+        return (
+          <div key={tab.key} style={{ flex: 1, padding: '10px 4px', borderRadius: 24, background: isA ? t.primarySoft : 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, color: isA ? t.primary : t.inkSoft }}>
+            <IconC size={20} stroke={1.7}/>
+            <div style={{ fontSize: 10.5, fontWeight: 600 }}>{tab.label}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function HomeIndicator() {
+  return (
+    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60, height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingBottom: 8, pointerEvents: 'none' }}>
+      <div style={{ width: 139, height: 5, borderRadius: 100, background: 'rgba(245,246,250,0.5)' }}/>
+    </div>
+  );
+}
+
+// ────────────── SCREEN 1: HOME (DASHBOARD) ──────────────
+function Home() {
+  const featured = GAMES[0];
+  const featP = gamePalette[featured.key];
+  const FIcon = Icons[featured.icon];
+
+  return (
+    <div style={{ height: '100%', position: 'relative', overflow: 'hidden', background: t.bg, color: t.ink }}>
+      <StatusBar/>
+      {/* halos */}
+      <div style={{ position: 'absolute', top: -120, left: -80, width: 320, height: 320, borderRadius: '50%', background: 'radial-gradient(circle, rgba(155,124,255,0.35) 0%, transparent 60%)', pointerEvents: 'none', filter: 'blur(20px)' }}/>
+      <div style={{ position: 'absolute', top: 60, right: -100, width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,184,92,0.22) 0%, transparent 60%)', pointerEvents: 'none', filter: 'blur(20px)' }}/>
+
+      <div style={{ paddingTop: 70, padding: '70px 20px 0', position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 22 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, color: t.inkSoft, fontWeight: 500 }}>Tonight</div>
+            <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.7, lineHeight: 1.1, margin: '2px 0 0', whiteSpace: 'nowrap' }}>
+              Pick your <span style={{ background: 'linear-gradient(135deg, #9B7CFF, #FFB85C)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>fate</span>
+            </h1>
+          </div>
+          <div style={{ width: 40, height: 40, flexShrink: 0, borderRadius: 20, background: 'linear-gradient(135deg, #9B7CFF, #FFB85C)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 16px rgba(155,124,255,0.4)' }}>
+            <Icons.Sparkle size={18} color="#fff" stroke={2}/>
+          </div>
+        </div>
+
+        {/* HERO featured card */}
+        <div style={{
+          borderRadius: 26, padding: 22, marginBottom: 14,
+          background: `linear-gradient(135deg, ${featP.from} 0%, ${featP.to} 100%)`,
+          color: '#fff', position: 'relative', overflow: 'hidden',
+          boxShadow: `0 20px 50px ${featP.glow}55`,
+          minHeight: 140,
+        }}>
+          <div style={{ position: 'absolute', right: -40, top: -40, width: 180, height: 180, borderRadius: 90, background: 'rgba(255,255,255,0.12)' }}/>
+          <div style={{ position: 'absolute', right: 30, bottom: -20, width: 90, height: 90, borderRadius: 45, background: 'rgba(255,255,255,0.08)' }}/>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.5, opacity: 0.85, textTransform: 'uppercase', marginBottom: 8 }}>Suggested</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 18, background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(255,255,255,0.3)' }}>
+                <FIcon size={28} color="#fff" stroke={2}/>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: -0.4 }}>{featured.title}</div>
+                <div style={{ fontSize: 13, opacity: 0.9, marginTop: 2 }}>{featured.sub}</div>
+              </div>
+            </div>
+            <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 20, background: 'rgba(255,255,255,0.22)', border: '1px solid rgba(255,255,255,0.3)', fontSize: 13, fontWeight: 700 }}>
+              Play <Icons.ChevronRight size={14} color="#fff" stroke={2.2}/>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 800, color: t.inkFaint, letterSpacing: 1.5, textTransform: 'uppercase', margin: '10px 4px 12px' }}>All games</div>
+
+        {/* COLOR TILE GRID */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          {GAMES.slice(1).map(g => {
+            const IconC = Icons[g.icon];
+            const p = gamePalette[g.key];
+            return (
+              <div key={g.key} style={{
+                borderRadius: 22, padding: 16,
+                background: `linear-gradient(150deg, ${p.from}30 0%, ${p.to}18 100%)`,
+                border: `1px solid ${p.glow}33`,
+                display: 'flex', flexDirection: 'column', gap: 12,
+                aspectRatio: '1.05', position: 'relative', overflow: 'hidden',
+              }}>
+                <div style={{ position: 'absolute', right: -30, bottom: -30, width: 90, height: 90, borderRadius: 45, background: `${p.glow}25`, filter: 'blur(10px)' }}/>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 13,
+                  background: `linear-gradient(135deg, ${p.from}, ${p.to})`,
+                  color: '#fff',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: `0 6px 14px ${p.glow}55`,
+                  position: 'relative', zIndex: 1,
+                }}>
+                  <IconC size={20} stroke={2}/>
+                </div>
+                <div style={{ flex: 1 }}/>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{ fontSize: 14.5, fontWeight: 800, letterSpacing: -0.2, marginBottom: 2, color: t.ink }}>{g.title}</div>
+                  <div style={{ fontSize: 11.5, color: t.inkSoft, lineHeight: 1.3 }}>{g.sub}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ height: 110 }}/>
+      </div>
+
+      <TabBar/>
+      <HomeIndicator/>
+    </div>
+  );
+}
+
+// ────────────── SCREEN 2: COIN FLIP ──────────────
+function Coin() {
+  return (
+    <div style={{ height: '100%', position: 'relative', overflow: 'hidden', background: t.bg, color: t.ink }}>
+      <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)', width: 520, height: 520, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,184,92,0.28) 0%, transparent 60%)', pointerEvents: 'none' }}/>
+      <div style={{ position: 'absolute', top: -100, right: -50, width: 240, height: 240, borderRadius: '50%', background: 'radial-gradient(circle, rgba(155,124,255,0.18) 0%, transparent 60%)', filter: 'blur(20px)' }}/>
+      <StatusBar/>
+      <NavBar title="Coin Flip"/>
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -52%)' }}>
+        <div style={{ position: 'relative', width: 260, height: 260 }}>
+          <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'linear-gradient(160deg, #FFD68A 0%, #FFB85C 40%, #C97A22 100%)', boxShadow: '0 30px 80px rgba(255,184,92,0.55), inset 0 6px 16px rgba(255,255,255,0.55), inset 0 -10px 24px rgba(120,60,5,0.3)' }}/>
+          <div style={{ position: 'absolute', inset: 12, borderRadius: '50%', border: '1.5px dashed rgba(80,40,5,0.3)' }}/>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, color: '#3A2010' }}>
+            <Icons.Crown size={56} color="#3A2010" stroke={1.6}/>
+            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 6 }}>HEADS</div>
+          </div>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', bottom: 80, left: 0, right: 0, textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 18px', borderRadius: 24, background: t.card, border: `1px solid ${t.cardBorder}`, fontSize: 13.5, color: t.inkSoft, fontWeight: 500 }}>
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 11V3M3 7l4-4 4 4" stroke="#FFB85C" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          Swipe up or tap the coin
+        </div>
+      </div>
+      <HomeIndicator/>
+    </div>
+  );
+}
+
+// ────────────── SCREEN 3: RANDOM DRAW ──────────────
+function Draw() {
+  const items = ['Adèle', 'Mael', 'Junior', 'Kira', 'Sébastien'];
+  const idx = 2;
+  const drawP = gamePalette.draw;
+  return (
+    <div style={{ height: '100%', position: 'relative', overflow: 'hidden', background: t.bg, color: t.ink }}>
+      <div style={{ position: 'absolute', top: 100, left: -50, width: 280, height: 280, borderRadius: '50%', background: `radial-gradient(circle, ${drawP.glow}33 0%, transparent 60%)`, filter: 'blur(20px)' }}/>
+      <StatusBar/>
+      <NavBar title="Random Draw" trailing={
+        <div style={{ minWidth: 28, height: 28, padding: '0 10px', borderRadius: 14, background: `linear-gradient(135deg, ${drawP.from}, ${drawP.to})`, color: '#fff', fontSize: 13, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>5</div>
+      }/>
+      <div style={{ position: 'absolute', top: 130, left: 20, right: 20, bottom: 240, borderRadius: 28, background: t.card, border: `1px solid ${t.cardBorder}`, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 70, background: `linear-gradient(${t.card} 30%, transparent)`, zIndex: 2 }}/>
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 70, background: `linear-gradient(transparent, ${t.card} 70%)`, zIndex: 2 }}/>
+        <div style={{ position: 'absolute', top: '50%', left: 16, right: 16, transform: 'translateY(-50%)', height: 64, borderRadius: 16, background: `linear-gradient(135deg, ${drawP.from}22, ${drawP.to}22)`, border: `1.5px solid ${drawP.glow}77` }}/>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 4 }}>
+          {items.map((name, i) => {
+            const dist = Math.abs(i - idx);
+            const isC = i === idx;
+            return (
+              <div key={i} style={{ fontSize: isC ? 30 : 20, fontWeight: isC ? 800 : 500, color: isC ? t.ink : t.inkSoft, opacity: 1 - dist * 0.3, letterSpacing: -0.5, lineHeight: 1.6 }}>
+                {name}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div style={{ position: 'absolute', bottom: 130, left: 20, right: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', borderRadius: 14, padding: 4, background: 'rgba(255,255,255,0.04)' }}>
+          {['List', 'Free entry'].map((tab, i) => (
+            <div key={tab} style={{ flex: 1, padding: '10px 0', borderRadius: 10, textAlign: 'center', fontSize: 13, fontWeight: 600, background: i === 0 ? t.card : 'transparent', color: i === 0 ? t.ink : t.inkSoft }}>{tab}</div>
+          ))}
+        </div>
+        <div style={{ padding: '14px 16px', borderRadius: 14, background: t.card, border: `1px solid ${t.cardBorder}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: `linear-gradient(135deg, ${drawP.from}, ${drawP.to})`, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icons.List size={16} stroke={2}/>
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 15, fontWeight: 700 }}>Junior's group</div>
+            <div style={{ fontSize: 12, color: t.inkSoft, marginTop: 1 }}>5 names · last used today</div>
+          </div>
+          <Icons.ChevronRight size={16} color={t.inkFaint}/>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', bottom: 56, left: 20, right: 20 }}>
+        <div style={{ height: 56, borderRadius: 28, background: `linear-gradient(135deg, ${drawP.from}, ${drawP.to})`, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 17, fontWeight: 800, boxShadow: `0 14px 36px ${drawP.glow}66, inset 0 1px 0 rgba(255,255,255,0.3)` }}>
+          <Icons.Shuffle size={18} stroke={2.4}/> Draw
+        </div>
+      </div>
+      <HomeIndicator/>
+    </div>
+  );
+}
+
+// ────────────── SCREEN 4: CUSTOMIZE WHEEL ──────────────
+function Wheel() {
+  const opts = [
+    { name: 'Pizza', color: '#FF7088', val: 32 },
+    { name: 'Sushi', color: '#FFB85C', val: 28 },
+    { name: 'Ramen', color: '#3FCC86', val: 25 },
+    { name: 'Tacos', color: '#62B0FF', val: 15 },
+  ];
+  return (
+    <div style={{ height: '100%', position: 'relative', overflow: 'hidden', background: t.bg, color: t.ink }}>
+      <div style={{ position: 'absolute', top: -100, left: -50, width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(155,124,255,0.2) 0%, transparent 60%)', filter: 'blur(20px)' }}/>
+      <StatusBar/>
+      <NavBar title="Customize wheel" trailing={
+        <div style={{ width: 40, height: 40, borderRadius: 20, background: 'linear-gradient(135deg, #9B7CFF, #7C5BDD)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 12px rgba(155,124,255,0.4)' }}>
+          <Icons.Plus size={18} stroke={2.2}/>
+        </div>
+      }/>
+      <div style={{ paddingTop: 130, padding: '130px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16, borderRadius: 22, marginBottom: 18, background: t.card, border: `1px solid ${t.cardBorder}` }}>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            {(() => {
+              let acc = -90;
+              return opts.map((o, i) => {
+                const ang = (o.val / 100) * 360;
+                const a1 = (acc * Math.PI) / 180;
+                const a2 = ((acc + ang) * Math.PI) / 180;
+                const large = ang > 180 ? 1 : 0;
+                const x1 = 32 + Math.cos(a1) * 28;
+                const y1 = 32 + Math.sin(a1) * 28;
+                const x2 = 32 + Math.cos(a2) * 28;
+                const y2 = 32 + Math.sin(a2) * 28;
+                const path = `M32 32 L${x1} ${y1} A28 28 0 ${large} 1 ${x2} ${y2} Z`;
+                acc += ang;
+                return <path key={i} d={path} fill={o.color} stroke={t.bg} strokeWidth="1.5"/>;
+              });
+            })()}
+            <circle cx="32" cy="32" r="9" fill={t.bg}/>
+          </svg>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, fontWeight: 800, marginBottom: 2 }}>Preview</div>
+            <div style={{ fontSize: 12, color: t.inkSoft }}>{opts.length} options · 100%</div>
+          </div>
+          <div style={{ padding: '6px 10px', borderRadius: 10, background: 'linear-gradient(135deg, #3FCC86, #2EA86A)', color: '#fff', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Icons.Check size={12} stroke={2.8}/> Valid
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {opts.map((o, i) => (
+            <div key={i} style={{ borderRadius: 18, padding: '14px 16px', background: t.card, border: `1px solid ${o.color}33`, position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: o.color }}/>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                <div style={{ width: 24, height: 24, borderRadius: 8, background: o.color, flexShrink: 0, boxShadow: `0 4px 10px ${o.color}66` }}/>
+                <input defaultValue={o.name} style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: t.ink, fontSize: 15, fontWeight: 700 }}/>
+                <div style={{ fontSize: 16, fontWeight: 800, color: o.color }}>{o.val}%</div>
+              </div>
+              <div style={{ position: 'relative', height: 6, borderRadius: 3, background: 'rgba(255,255,255,0.06)' }}>
+                <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${o.val * 3}%`, maxWidth: '100%', borderRadius: 3, background: `linear-gradient(90deg, ${o.color}88, ${o.color})` }}/>
+                <div style={{ position: 'absolute', left: `calc(${o.val * 3}% - 11px)`, top: -8, width: 22, height: 22, borderRadius: 11, background: '#fff', boxShadow: `0 2px 6px rgba(0,0,0,0.2), 0 0 0 2px ${o.color}` }}/>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ position: 'absolute', bottom: 56, left: 20, right: 20 }}>
+        <div style={{ height: 56, borderRadius: 28, background: 'linear-gradient(135deg, #9B7CFF, #7C5BDD)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, fontSize: 17, fontWeight: 800, boxShadow: '0 14px 36px rgba(155,124,255,0.5), inset 0 1px 0 rgba(255,255,255,0.3)' }}>
+          <Icons.Eye size={18} stroke={2.4}/> See the wheel
+        </div>
+      </div>
+      <HomeIndicator/>
+    </div>
+  );
+}
+
+// ────────────── APP — renders 4 phones side by side ──────────────
+function App() {
+  return (
+    <>
+      <div className="phone"><div className="notch"/><Home/></div>
+      <div className="phone"><div className="notch"/><Coin/></div>
+      <div className="phone"><div className="notch"/><Draw/></div>
+      <div className="phone"><div className="notch"/><Wheel/></div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

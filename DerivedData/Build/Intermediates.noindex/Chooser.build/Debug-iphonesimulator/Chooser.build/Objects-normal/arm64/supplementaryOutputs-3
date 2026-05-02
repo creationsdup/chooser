@@ -1,0 +1,23 @@
+{
+  "/Users/maeldupin/Desktop/Chooser/Chooser/Extensions.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/Extensions.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/Extensions.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/Extensions.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/Extensions.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/Extensions.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/FingerChooserView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/FingerChooserView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/FingerChooserView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/FingerChooserView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/FingerChooserView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/FingerChooserView.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/HomeView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/HomeView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/HomeView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/HomeView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/HomeView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/arm64/HomeView.swiftdeps"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "/Users/maeldupin/Desktop/Chooser/Chooser/LuckyArrowView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/LuckyArrowView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/LuckyArrowView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/LuckyArrowView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/LuckyArrowView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/LuckyArrowView.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/MyListsView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/MyListsView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/MyListsView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/MyListsView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/MyListsView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/MyListsView.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/NumberRouletteClassicView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/NumberRouletteClassicView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/NumberRouletteClassicView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/NumberRouletteClassicView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/NumberRouletteClassicView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedData/Build/Intermediates.noindex/Chooser.build/Debug-iphonesimulator/Chooser.build/Objects-normal/x86_64/NumberRouletteClassicView.swiftdeps"
+  }
+}

@@ -1,18 +1,15 @@
-//
-//  Item.swift
-//  Chooser
-//
-//  Created by Maël DUPIN on 31/03/2026.
-//
-
-import Foundation
 import SwiftData
+import Foundation
 
 @Model
-final class Item {
-    var timestamp: Date
-    
-    init(timestamp: Date) {
-        self.timestamp = timestamp
+final class ChoiceList {
+    var name: String
+    var items: [String]
+    var createdAt: Date
+
+    init(name: String, items: [String] = [], createdAt: Date = .now) {
+        self.name = name
+        self.items = items
+        self.createdAt = createdAt
     }
 }

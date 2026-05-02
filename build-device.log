@@ -1,0 +1,218 @@
+2026-04-29 22:46:55.608 xcodebuild[22196:6569078]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-04-29 22:46:55.716 xcodebuild[22196:6569074] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+2026-04-29 22:46:55.938 xcodebuild[22196:6569079] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2026-04-29 22:46:55.938 xcodebuild[22196:6569118] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f39540e0> { count = 1, transaction: 0, voucher = 0x0, contents =
+	"XPCErrorDescription" => <string: 0x1f3954220> { string cache = 0x0, length = 18, contents = "Connection invalid" }
+}>
+2026-04-29 22:46:55.938 xcodebuild[22196:6569118] Error opening log file (/Users/maeldupin/Library/Logs/CoreSimulator/CoreSimulator.com.apple.dt.xcodebuild.log): Operation not permitted
+[-[SimServiceContext sendRequest:]:1751] ERROR : Unable to deliver request ({
+    "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
+    request = "set_developer_dir";
+}) because we are not connected to CoreSimulatorService.
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -project Chooser.xcodeproj -scheme Chooser -configuration Debug -destination generic/platform=iOS -derivedDataPath ./DerivedDataNoSign CODE_SIGNING_ALLOWED=NO build
+
+Build settings from command line:
+    CODE_SIGNING_ALLOWED = NO
+
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]:432] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
+[-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
+[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
+[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:468] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=410 "The service used to manage runtime disk images (simdiskimaged) crashed or is not responding" UserInfo={NSLocalizedDescription=The service used to manage runtime disk images (simdiskimaged) crashed or is not responding}
+[-[SimServiceContext sendRequest:reply:error:]:1771] ERROR : Unable to deliver request ({
+    request = "notification_subscription";
+    "set_path" = "/Users/maeldupin/Library/Developer/CoreSimulator/Devices";
+}) because we are not connected to CoreSimulatorService.
+2026-04-29 22:46:55.980 xcodebuild[22196:6569078] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+[-[SimServiceContext sendRequest:reply:error:]:1771] ERROR : Unable to deliver request ({
+    request = "notification_subscription";
+    "set_path" = "/Users/maeldupin/Library/Developer/CoreSimulator/Devices";
+}) because we are not connected to CoreSimulatorService.
+2026-04-29 22:46:55.982 xcodebuild[22196:6569117] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+2026-04-29 22:46:55.982 xcodebuild[22196:6569078]  IDESimulatorAvailability: startObservingSimulatorUpdates() FAILED to register SimDeviceSet observer
+2026-04-29 22:46:55.982 xcodebuild[22196:6569117]  iOSSimulator: [SimServiceContext defaultDeviceSetWithError:] returned nil (Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0x9ba914c00 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}). Simulator device support disabled.
+2026-04-29 22:46:55.982 xcodebuild[22196:6569074] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:80
+Details:  detectedTypeIdentifier (com.apple.binary-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.BinaryPlist
+Object:   <DVTFileDataTypeDetectionMagicCache: 0x9ba7bff60>
+Method:   -initWithExtension:
+Thread:   <_NSMainThread: 0x1008a5c10>{number = 1, name = main}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-04-29 22:46:55.983 xcodebuild[22196:6569074] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:80
+Details:  detectedTypeIdentifier (com.apple.xml-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.XMLPlist
+Object:   <DVTFileDataTypeDetectionMagicCache: 0x9ba822d00>
+Method:   -initWithExtension:
+Thread:   <_NSMainThread: 0x1008a5c10>{number = 1, name = main}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-04-29 22:46:56.073 xcodebuild[22196:6569074] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (1 target)
+    Target 'Chooser' in project 'Chooser' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.4.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/maeldupin/Desktop/Chooser/Chooser/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 79162abc6b71b2adbb5e310214eb063c
+Build description path: /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/XCBuildData/79162abc6b71b2adbb5e310214eb063c.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.4.sdk /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/SDKStatCaches.noindex/iphoneos26.4-23E237-68a138bb55de9ba35ce6c8c40d12849e.sdkstatcache
+    cd /Users/maeldupin/Desktop/Chooser/Chooser.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.4.sdk -o /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/SDKStatCaches.noindex/iphoneos26.4-23E237-68a138bb55de9ba35ce6c8c40d12849e.sdkstatcache
+Failed to create FS event stream. Considering the cache up-to-date.
+
+Ld /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos/Chooser.app/__preview.dylib normal (in target 'Chooser' from project 'Chooser')
+    cd /Users/maeldupin/Desktop/Chooser
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios18.0 -dynamiclib -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.4.sdk -O0 -L/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos -F/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos -install_name @rpath/Chooser.debug.dylib -Xlinker -dead_strip -rdynamic -Xlinker -no_deduplicate -Xlinker -debug_variant -Xlinker -dependency_info -Xlinker /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Chooser_dependency_info.dat -o /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos/Chooser.app/__preview.dylib
+
+CompileAssetCatalogVariant thinned /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos/Chooser.app /Users/maeldupin/Desktop/Chooser/Chooser/Assets.xcassets (in target 'Chooser' from project 'Chooser')
+    cd /Users/maeldupin/Desktop/Chooser
+    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/maeldupin/Desktop/Chooser/Chooser/Assets.xcassets --compile /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/assetcatalog_dependencies_thinned --output-partial-info-plist /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --minimum-deployment-target 18.0 --platform iphoneos
+2026-04-29 22:46:58.835 ibtoold[22225:6569573] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2026-04-29 22:46:58.836 ibtoold[22225:6569581] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f39540e0> { count = 1, transaction: 0, voucher = 0x0, contents =
+	"XPCErrorDescription" => <string: 0x1f3954220> { string cache = 0x0, length = 18, contents = "Connection invalid" }
+}>
+2026-04-29 22:46:58.836 ibtoold[22225:6569573] Error opening log file (/Users/maeldupin/Library/Logs/CoreSimulator/CoreSimulator.com.apple.ibtool.log): Operation not permitted
+[-[SimServiceContext sendRequest:]:1751] ERROR : Unable to deliver request ({
+    "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
+    request = "set_developer_dir";
+}) because we are not connected to CoreSimulatorService.
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]:432] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
+[-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
+[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
+[-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:468] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=409 "Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded" UserInfo={NSLocalizedDescription=Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded}
+[-[SimServiceContext sendRequest:reply:error:]:1771] ERROR : Unable to deliver request ({
+    request = "notification_subscription";
+    "set_path" = "/Users/maeldupin/Library/Developer/CoreSimulator/Devices";
+}) because we are not connected to CoreSimulatorService.
+2026-04-29 22:46:58.927 ibtoold[22225:6569364] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+[-[SimServiceContext sendRequest:]:1751] ERROR : Unable to deliver request ({
+    "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
+    request = "set_developer_dir";
+}) because we are not connected to CoreSimulatorService.
+2026-04-29 22:46:59.108 ibtoold[22225:6569582] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]:432] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
+[-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:468] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=409 "Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded" UserInfo={NSLocalizedDescription=Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded}
+[-[SimServiceContext sendRequest:]:1751] ERROR : Unable to deliver request ({
+    path = "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/Library/Xcode/PrivatePlugIns/IDEInterfaceBuilderAppleTVIntegration.framework/Resources";
+    request = "add_profiles";
+}) because we are not connected to CoreSimulatorService.
+[-[SimServiceContext sendRequest:]:1751] ERROR : Unable to deliver request ({
+    path = "/Applications/Xcode.app/Contents/PlugIns/IDEInterfaceBuilderiOSIntegration.framework/Resources";
+    request = "add_profiles";
+}) because we are not connected to CoreSimulatorService.
+/* com.apple.actool.errors */
+/Users/maeldupin/Desktop/Chooser/Chooser/Assets.xcassets: error: No available simulator runtimes for platform iphonesimulator. SimServiceContext supportedRuntimes=[]
+/* com.apple.actool.compilation-results */
+/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/assetcatalog_generated_info.plist_thinned
+/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/assetcatalog_output/thinned/AppIcon60x60@2x.png
+/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/assetcatalog_output/thinned/AppIcon76x76@2x~ipad.png
+
+
+SwiftDriver Chooser normal arm64 com.apple.xcode.tools.swift.compiler (in target 'Chooser' from project 'Chooser')
+    cd /Users/maeldupin/Desktop/Chooser
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name Chooser -Onone @/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Chooser.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.4.sdk -target arm64-apple-ios18.0 -g -module-cache-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos -F /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos -emit-localized-strings -emit-localized-strings-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/SDKStatCaches.noindex/iphoneos26.4-23E237-68a138bb55de9ba35ce6c8c40d12849e.sdkstatcache -output-file-map /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Chooser-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex -sdk-module-cache-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Chooser.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Chooser_const_extract_protocols.json -Xcc -iquote -Xcc /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Chooser-generated-files.hmap -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Chooser-own-target-headers.hmap -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Chooser-all-target-headers.hmap -Xcc -iquote -Xcc /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Chooser-project-headers.hmap -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos/include -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/DerivedSources-normal/arm64 -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/DerivedSources/arm64 -Xcc -I/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Chooser-Swift.h -working-directory /Users/maeldupin/Desktop/Chooser -experimental-emit-module-separately -disable-cmo
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_stddef-4F1ZS36NBMU3UHWB53C1T6CO.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/DeveloperToolsSupport-99D0TF8SLE1DTHYZ8N4UN5Q5D.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/ptrauth-5MZILS2KWE56CWNMNZ8D2NOLB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_stdarg-4O3GSEO8Q49QV25WGVCX4L03A.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/SwiftShims-ETT0KSW1VCDELBZL84YROCE6H.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_AvailabilityInternal-4MFJ05QUE1IO1UT5FOSLHT69U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/ptrcheck-5Y3GWCKU182FU5VGCBQBTS9TE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_stdbool-A54AJC2KWV75EP25XVZWVIHDD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_SwiftConcurrencyShims-EGCZGY89N6M7NTF85B3IFQ8HN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_float-DLL8K91ZV1CC2RWNLB6HKLJB6.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_DarwinFoundation1-ATIQ1K7QNCMS4NTW8G05OSJHD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_limits-23ZOIFX4PX3Q8ZGYQAMXBUC9F.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_DarwinFoundation2-7Q48TKQ2ZHMU13H1XQ3KP9JWL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_stdint-PJBM7ENSRJ1596U61CID0XKB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/sys_types-2NJY0VOCR0RDQPD0DRSEEWPNL.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_tgmath-5QYW9MQ08QMMZ6K7GOCN3028N.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_DarwinFoundation3-7IRYQOW0YJPAP64XYI52PELU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_intrinsics-6U837IWSYLP6J9FL1NQITDVXG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_stdatomic-9ZPYQG9QGI5YQ9BI3GJGIXKGG.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/_Builtin_inttypes-8J6AABBSKEFB51Q2NLBOPTC04.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/Darwin-BZUPQ2OBCPA8C24XA6YLH1JOU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/simd-AYSLQDGDPTZLJFN4LUP1OZE.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/ObjectiveC-3U7N3G8MHM076EJGLHDJZ2JEJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/MachO-B90S906UNFSXZ6AR33PA4WWRM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/os_object-3IFO8PB0U2G5MESZ39MPQRIF4.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/Spatial-BYLTT18A898A2GELOWU1EV0X8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/os_workgroup-8ZLW6H0FHOOHXD7S5BSQPH8BJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/Dispatch-37CT738Y0T40ENZLZYQO6LW7S.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/XPC-455459KKNOM3MFN6RFQ6827LA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/CoreFoundation-A322L49DHT8231DLDMV8CPKQW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/os-8YPYAW1GEM85ANHE1ZLEYH3XW.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/CFNetwork-7I4ZCGY5XCLM2RRG44N8OK7Z.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/Security-37YL9G2MJBCODRVSRGXSLXSHX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/CoreGraphics-DIUP8H12D55LR9IMMXPQNAODK.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/Foundation-AYPOSZ1ZK5QPZ0H0SILMXQDW8.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/CoreText-BT36SC8TGR33U6E33XEOQTN56.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/ModuleCache.noindex/ImageIO-9RUPAKHOIS9HEHHPJL0DLLIP0.pcm
+
+** BUILD FAILED **
+
+
+The following build commands failed:
+	CompileAssetCatalogVariant thinned /Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Products/Debug-iphoneos/Chooser.app /Users/maeldupin/Desktop/Chooser/Chooser/Assets.xcassets (in target 'Chooser' from project 'Chooser')
+	Building project Chooser with scheme Chooser and configuration Debug
+(2 failures)

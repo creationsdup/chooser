@@ -1,0 +1,23 @@
+{
+  "/Users/maeldupin/Desktop/Chooser/Chooser/Item.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Item.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Item.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Item.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Item.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/Item.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/LanguageManager.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/LanguageManager.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/LanguageManager.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/LanguageManager.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/LanguageManager.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/LanguageManager.swiftdeps"
+  },
+  "/Users/maeldupin/Desktop/Chooser/Chooser/ListDetailView.swift" : {
+    "const-values" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ListDetailView.swiftconstvalues",
+    "dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ListDetailView.d",
+    "diagnostics" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ListDetailView.dia",
+    "object" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ListDetailView.o",
+    "swift-dependencies" : "/Users/maeldupin/Desktop/Chooser/DerivedDataNoSign/Build/Intermediates.noindex/Chooser.build/Debug-iphoneos/Chooser.build/Objects-normal/arm64/ListDetailView.swiftdeps"
+  }
+}

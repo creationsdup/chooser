@@ -1,0 +1,97 @@
+/* ── Tabs ── */
+"tab.home"       = "Accueil";
+"tab.lists"      = "Mes Listes";
+"tab.appearance" = "Apparence";
+"tab.settings"   = "Réglages";
+
+/* ── Splash ── */
+"splash.tagline" = "Le hasard, c'est toi qui décides";
+
+/* ── Home ── */
+"home.title" = "Chooser 🎲";
+
+/* ── Picker modes ── */
+"mode.fingerChooser.title"    = "Finger Chooser";
+"mode.fingerChooser.subtitle" = "Pose plusieurs doigts, un sera choisi";
+"mode.roulette.title"         = "Roulette";
+"mode.roulette.subtitle"      = "Fais tourner la roue du destin";
+"mode.dice.title"             = "Dés";
+"mode.dice.subtitle"          = "Lance un ou plusieurs dés";
+"mode.randomDraw.title"       = "Tirage au Sort";
+"mode.randomDraw.subtitle"    = "Pioche un élément de ta liste";
+"mode.coinFlip.title"         = "Pile ou Face";
+"mode.coinFlip.subtitle"      = "Laisse le sort décider";
+"mode.numberRoulette.title"   = "Nombre Aléatoire";
+"mode.numberRoulette.subtitle" = "Tire un nombre dans une plage définie";
+"mode.luckyArrow.title"       = "Flèche du Hasard";
+"mode.luckyArrow.subtitle"    = "Tourne la flèche et laisse le sort décider";
+"mode.weightedRoulette.title"    = "Roue Pondérée";
+"mode.weightedRoulette.subtitle" = "Définis tes propres probabilités";
+
+/* ── My Lists ── */
+"lists.title"             = "Mes Listes";
+"lists.empty.title"       = "Aucune liste";
+"lists.empty.body"        = "Crée ta première liste pour\nl'utiliser dans la Roulette\nou le Tirage au Sort !";
+"lists.create"            = "Créer une liste";
+"lists.new.title"         = "Nouvelle liste";
+"lists.new.nameSection"   = "Nom de la liste";
+"lists.new.placeholder"   = "Ex : Films à regarder…";
+"lists.item.singular"     = "1 élément";
+"lists.item.plural"       = "%d éléments";
+
+/* ── List detail ── */
+"detail.addPlaceholder"   = "Ajouter un élément…";
+"detail.emptyTitle"       = "Liste vide";
+"detail.emptyBody"        = "Appuie sur + pour ajouter des éléments";
+
+/* ── Settings ── */
+"settings.title"          = "Réglages";
+"settings.feedback"       = "Feedback";
+"settings.sound"          = "Sons";
+"settings.haptics"        = "Vibrations";
+"settings.preferences"    = "Préférences";
+"settings.defaultMode"    = "Mode par défaut";
+"settings.stats"          = "Statistiques";
+"settings.stats.lists"    = "Listes créées";
+"settings.stats.items"    = "Éléments au total";
+"settings.danger"         = "Zone de danger";
+"settings.reset"          = "Effacer toutes les données";
+"settings.reset.footer"   = "Supprime toutes les listes et leurs éléments. Cette action est irréversible.";
+"settings.reset.confirm"  = "Effacer toutes les données ?";
+"settings.reset.action"   = "Tout effacer";
+"settings.reset.message"  = "Toutes tes listes et leurs éléments seront supprimés définitivement.";
+"settings.about"          = "À propos";
+"settings.version"        = "Version";
+
+/* ── Language ── */
+"settings.language.section" = "Langue";
+"settings.language.label"   = "Langue";
+"lang.system"               = "Automatique";
+"lang.system.detail"        = "Suit la langue de l'iPhone";
+"lang.fr"                   = "Français";
+"lang.en"                   = "English";
+
+/* ── Appearance ── */
+"personalization.title"       = "Personnalisation";
+"appearance.theme"            = "Thème";
+"appearance.theme.footer"     = "Modifie les couleurs d'accent de l'application.";
+"appearance.roulette"         = "Roulette";
+"appearance.wheelFrame"       = "Cadre de la roue";
+"appearance.numberStyle"      = "Style « Nombre Aléatoire »";
+"appearance.numberStyle.slot"    = "Slot Machine";
+"appearance.numberStyle.classic" = "Classique";
+"appearance.animations"       = "Animations";
+"appearance.confetti"         = "Confettis";
+"appearance.intensity"        = "Intensité des animations";
+"appearance.intensity.light"  = "Légères";
+"appearance.intensity.normal" = "Normales";
+"appearance.intensity.intense" = "Intenses";
+"appearance.animation.footer" = "Ajuste la vivacité des effets visuels dans toute l'application.";
+
+/* ── Buttons ── */
+"button.cancel"  = "Annuler";
+"button.create"  = "Créer";
+"button.ok"      = "OK";
+"button.close"   = "Fermer";
+"button.edit"    = "Modifier";
+"button.delete"  = "Supprimer";

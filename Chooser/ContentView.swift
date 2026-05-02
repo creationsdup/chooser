@@ -1,80 +1,48 @@
-//
-//  ContentView.swift
-//  Chooser
-//
-//  Created by Maël DUPIN on 31/03/2026.
-//
-
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+struct RootTabView: View {
+    @Environment(LanguageManager.self)    private var lm
+    @Environment(AppearanceManager.self) private var appearance
 
     var body: some View {
-        NavigationViewWrapper {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
-                }
-                .onDelete(perform: deleteItems)
+        TabView {
+            NavigationStack {
+                HomeView()
             }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
-            .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-#endif
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
+            .tabItem {
+                Label(lm.t("tab.home"), systemImage: "square.grid.2x2.fill")
             }
-        }
-    }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
+            NavigationStack {
+                MyListsView()
+            }
+            .tabItem {
+                Label(lm.t("tab.lists"), systemImage: "list.bullet.clipboard.fill")
+            }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            NavigationStack {
+                PersonalizationView()
+            }
+            .tabItem {
+                Label(lm.t("tab.appearance"), systemImage: "paintpalette.fill")
+            }
+
+            NavigationStack {
+                SettingsView()
+            }
+            .tabItem {
+                Label(lm.t("tab.settings"), systemImage: "gearshape.fill")
             }
         }
-    }
-}
-
-fileprivate struct NavigationViewWrapper<Content: View>: View {
-    let content: () -> Content
-
-    var body: some View {
-#if os(macOS)
-        NavigationSplitView {
-            content()
-        } detail: {
-            Text("Select an item")
-        }
-#else
-        content()
-#endif
+        .tint(appearance.accent)
+        .environment(\.appTheme, appearance.resolvedTheme)
     }
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    RootTabView()
+        .modelContainer(for: ChoiceList.self, inMemory: true)
+        .environment(LanguageManager())
+        .environment(AppearanceManager())
 }
