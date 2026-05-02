@@ -61,14 +61,14 @@ enum PickerMode: String, CaseIterable, Identifiable {
     /// Gradient palette unique to each mode — used only in Playful style and icon accents.
     var gradient: [Color] {
         switch self {
-        case .fingerChooser:    return [Color(hex: "A855F7"), Color(hex: "EC4899")]
-        case .roulette:         return [Color(hex: "FF6B6B"), Color(hex: "FF8E53")]
-        case .dice:             return [Color(hex: "10B981"), Color(hex: "059669")]
-        case .randomDraw:       return [Color(hex: "4ECDC4"), Color(hex: "2563EB")]
-        case .coinFlip:         return [Color(hex: "F59E0B"), Color(hex: "D97706")]
-        case .numberRoulette:   return [Color(hex: "6366F1"), Color(hex: "8B5CF6")]
+        case .fingerChooser:    return [Color(hex: "7B5FE3"), Color(hex: "A285FF")]
+        case .roulette:         return [Color(hex: "E8556F"), Color(hex: "FF8094")]
+        case .dice:             return [Color(hex: "2EA86A"), Color(hex: "5DD49B")]
+        case .randomDraw:       return [Color(hex: "0EAFAA"), Color(hex: "3DD9D5")]
+        case .coinFlip:         return [Color(hex: "E89A3A"), Color(hex: "FFC97A")]
+        case .numberRoulette:   return [Color(hex: "5957D4"), Color(hex: "7977E8")]
         case .luckyArrow:       return [Color(hex: "FF2D55"), Color(hex: "FF7700")]
-        case .weightedRoulette: return [Color(hex: "0EA5E9"), Color(hex: "6366F1")]
+        case .weightedRoulette: return [Color(hex: "3A8DE8"), Color(hex: "62B0FF")]
         case .ranking:          return [Color(hex: "FBBF24"), Color(hex: "10B981")]
         }
     }
@@ -82,6 +82,7 @@ struct HomeView: View {
     @Environment(LanguageManager.self)    private var lm
     @Environment(AppearanceManager.self) private var appearance
     @Environment(\.verticalSizeClass)    private var verticalSizeClass
+    @Environment(\.colorScheme)          private var colorScheme
 
     @State private var selectedMode: PickerMode? = nil
 
@@ -122,7 +123,44 @@ struct HomeView: View {
         }
         .navigationTitle(lm.t("home.title"))
         .navigationBarTitleDisplayMode(.large)
-        .background(Color(.systemGroupedBackground))
+        .toolbarColorScheme(
+            (appearance.visualStyle == .atmos && colorScheme == .dark) ? .dark : nil,
+            for: .navigationBar
+        )
+        .background {
+            if appearance.visualStyle == .atmos {
+                ZStack {
+                    if colorScheme == .dark {
+                        Color(hex: "0B0D14")
+                        RadialGradient(
+                            colors: [Color(hex: "9B7CFF").opacity(0.35), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 160
+                        )
+                        .frame(width: 320, height: 320)
+                        .blur(radius: 20)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .offset(x: -40, y: -60)
+                        RadialGradient(
+                            colors: [Color(hex: "FFB85C").opacity(0.22), .clear],
+                            center: .center,
+                            startRadius: 0,
+                            endRadius: 140
+                        )
+                        .frame(width: 280, height: 280)
+                        .blur(radius: 20)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                        .offset(x: 50, y: 30)
+                    } else {
+                        Color.white
+                    }
+                }
+                .ignoresSafeArea()
+            } else {
+                Color(.systemGroupedBackground)
+            }
+        }
         .fullScreenCover(item: $selectedMode) { mode in
             pickerDestination(mode)
                 .environment(lm)
@@ -169,43 +207,15 @@ struct PickerModeCard: View {
     let isFeatured: Bool
     let visualStyle: AppVisualStyle
 
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         switch visualStyle {
+        case .atmos:
+            atmosCard
         case .playful:
             playfulCard
-        case .minimal:
-            minimalCard
-        case .midnight:
-            midnightCard
-        case .classic:
-            classicCard
         }
-    }
-
-    // ── Classic ────────────────────────────────────────────────────────────
-    // White/adaptive card with a colored icon strip at the top.
-    private var classicCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            iconStrip(height: isFeatured ? 110 : 76, iconSize: isFeatured ? 30 : 24)
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.system(size: isFeatured ? 16 : 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Text(subtitle)
-                    .font(.system(size: isFeatured ? 12 : 11, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 10)
-            .padding(.bottom, 12)
-        }
-        .background(Color(.secondarySystemGroupedBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 3)
     }
 
     // ── Playful ────────────────────────────────────────────────────────────
@@ -242,120 +252,147 @@ struct PickerModeCard: View {
         .shadow(color: mode.accentColor.opacity(0.30), radius: 10, x: 0, y: 5)
     }
 
-    // ── Minimal ─────────────────────────────────────────────────────────────
-    // Ultra-clean: white background, tiny colored icon dot, precise spacing.
-    private var minimalCard: some View {
-        HStack(alignment: isFeatured ? .center : .top, spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(mode.accentColor.opacity(0.12))
-                    .frame(width: isFeatured ? 48 : 38, height: isFeatured ? 48 : 38)
-                Image(systemName: mode.systemImage)
-                    .font(.system(size: isFeatured ? 20 : 16, weight: .semibold))
-                    .foregroundStyle(mode.accentColor)
-            }
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.system(size: isFeatured ? 17 : 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Text(subtitle)
-                    .font(.system(size: isFeatured ? 13 : 11, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(isFeatured ? 2 : 3)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 0)
+    // ── Atmos Vibrant Dark ─────────────────────────────────────────────────────
+    @ViewBuilder
+    private var atmosCard: some View {
+        if isFeatured {
+            atmosFeaturedCard
+        } else {
+            atmosTileCard
         }
-        .padding(isFeatured ? 16 : 12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color(.separator).opacity(0.5), lineWidth: 0.5)
-        )
     }
 
-    // ── Midnight ────────────────────────────────────────────────────────────
-    // Dark card, solid accent-colored icon area — premium, no gradient.
-    private var midnightCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ZStack(alignment: .center) {
-                // Solid accent-tinted icon zone
-                Rectangle()
-                    .fill(mode.accentColor.opacity(0.18))
-                    .frame(height: isFeatured ? 110 : 76)
+    private var isDark: Bool { colorScheme == .dark }
 
-                Image(systemName: mode.systemImage)
-                    .font(.system(size: isFeatured ? 30 : 24, weight: .semibold))
-                    .foregroundStyle(mode.accentColor)
-            }
-            .frame(maxWidth: .infinity)
-            .clipShape(.rect(
-                topLeadingRadius: 18,
-                bottomLeadingRadius: 0,
-                bottomTrailingRadius: 0,
-                topTrailingRadius: 18
-            ))
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.system(size: isFeatured ? 16 : 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                Text(subtitle)
-                    .font(.system(size: isFeatured ? 12 : 11, design: .rounded))
-                    .foregroundStyle(Color(hex: "A1A1AA"))
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 10)
-            .padding(.bottom, 12)
-        }
-        .background(Color(hex: "141418"))
-        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(mode.accentColor.opacity(0.20), lineWidth: 1)
-        )
-        .shadow(color: mode.accentColor.opacity(0.15), radius: 10, x: 0, y: 4)
-    }
-
-    // MARK: - Shared: icon strip
-
-    private func iconStrip(height: CGFloat, iconSize: CGFloat) -> some View {
+    private var atmosFeaturedCard: some View {
         ZStack(alignment: .bottomLeading) {
-            // Solid accent color — no gradient
-            mode.accentColor
-                .frame(height: height)
+            // Background
+            if isDark {
+                Color(hex: "161A24")
+                LinearGradient(
+                    stops: [
+                        .init(color: mode.gradient[0].opacity(0.19), location: 0),
+                        .init(color: mode.gradient[1].opacity(0.09), location: 1)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            } else {
+                Color.white
+                LinearGradient(
+                    stops: [
+                        .init(color: mode.gradient[0].opacity(0.10), location: 0),
+                        .init(color: mode.gradient[1].opacity(0.05), location: 1)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
 
-            // Decorative large icon
-            Image(systemName: mode.systemImage)
-                .font(.system(size: height * 0.75))
-                .foregroundStyle(.white.opacity(0.09))
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                .padding(10)
+            // Glow bottom-right
+            Circle()
+                .fill(mode.gradient[0].opacity(isDark ? 0.15 : 0.08))
+                .frame(width: 140, height: 140)
+                .blur(radius: 14)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .offset(x: 40, y: 40)
 
-            // Main icon
-            Image(systemName: mode.systemImage)
-                .font(.system(size: iconSize, weight: .semibold))
-                .foregroundStyle(.white)
-                .padding(12)
-                .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+            VStack(alignment: .leading, spacing: 0) {
+                ZStack {
+                    LinearGradient(colors: mode.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
+                    Image(systemName: mode.systemImage)
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                .frame(width: 40, height: 40)
+                .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+                .shadow(color: mode.gradient[0].opacity(0.33), radius: 7, x: 0, y: 3)
+
+                Spacer(minLength: 12)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 14.5, weight: .black, design: .rounded))
+                        .foregroundStyle(isDark ? .white : Color(hex: "1A1A2E"))
+                        .lineLimit(1)
+                    Text(subtitle)
+                        .font(.system(size: 11.5, design: .rounded))
+                        .foregroundStyle(isDark ? .white.opacity(0.6) : Color(hex: "1A1A2E").opacity(0.50))
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(16)
         }
-        .clipShape(
-            .rect(
-                topLeadingRadius: 18,
-                bottomLeadingRadius: 0,
-                bottomTrailingRadius: 0,
-                topTrailingRadius: 18
+        .frame(maxWidth: .infinity, minHeight: 130)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(mode.gradient[0].opacity(isDark ? 0.20 : 0.22), lineWidth: 1)
+        )
+        .shadow(color: mode.gradient[0].opacity(isDark ? 0.33 : 0.15), radius: isDark ? 20 : 10, x: 0, y: isDark ? 8 : 4)
+    }
+
+    private var atmosTileCard: some View {
+        ZStack(alignment: .bottomLeading) {
+            // Background
+            if isDark {
+                Color(hex: "161A24")
+            } else {
+                Color.white
+            }
+
+            LinearGradient(
+                stops: [
+                    .init(color: mode.gradient[0].opacity(isDark ? 0.19 : 0.10), location: 0),
+                    .init(color: mode.gradient[1].opacity(isDark ? 0.09 : 0.05), location: 1)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
             )
+
+            Circle()
+                .fill(mode.gradient[0].opacity(isDark ? 0.15 : 0.08))
+                .frame(width: 90, height: 90)
+                .blur(radius: 10)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .offset(x: 30, y: 30)
+
+            VStack(alignment: .leading, spacing: 0) {
+                ZStack {
+                    LinearGradient(colors: mode.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
+                    Image(systemName: mode.systemImage)
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                .frame(width: 40, height: 40)
+                .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+                .shadow(color: mode.gradient[0].opacity(0.33), radius: 7, x: 0, y: 3)
+
+                Spacer(minLength: 12)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 14.5, weight: .black, design: .rounded))
+                        .foregroundStyle(isDark ? .white : Color(hex: "1A1A2E"))
+                        .lineLimit(1)
+                    Text(subtitle)
+                        .font(.system(size: 11.5, design: .rounded))
+                        .foregroundStyle(isDark ? .white.opacity(0.6) : Color(hex: "1A1A2E").opacity(0.50))
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(16)
+        }
+        .aspectRatio(1.05, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .stroke(mode.gradient[0].opacity(isDark ? 0.20 : 0.22), lineWidth: 1)
         )
     }
+
 }
 
 #Preview {

@@ -55,10 +55,8 @@ enum AppColorScheme: String, CaseIterable, Identifiable {
 // MARK: - Visual Style
 
 enum AppVisualStyle: String, CaseIterable, Identifiable {
-    case classic  = "classic"
-    case playful  = "playful"
-    case minimal  = "minimal"
-    case midnight = "midnight"
+    case playful = "playful"
+    case atmos   = "atmos"
 
     var id: String { rawValue }
     var labelKey: String { "style.\(rawValue)" }
@@ -66,10 +64,8 @@ enum AppVisualStyle: String, CaseIterable, Identifiable {
 
     var icon: String {
         switch self {
-        case .classic:  return "square.grid.2x2.fill"
-        case .playful:  return "sparkles"
-        case .minimal:  return "rectangle"
-        case .midnight: return "moon.stars.fill"
+        case .playful: return "sparkles"
+        case .atmos:   return "wand.and.sparkles"
         }
     }
 }
@@ -87,7 +83,7 @@ final class AppearanceManager {
         didSet { UserDefaults.standard.set(accentColor.rawValue, forKey: "appAccentColor") }
     }
 
-    var visualStyle: AppVisualStyle = .classic {
+    var visualStyle: AppVisualStyle = .atmos {
         didSet { UserDefaults.standard.set(visualStyle.rawValue, forKey: "appVisualStyle") }
     }
 
