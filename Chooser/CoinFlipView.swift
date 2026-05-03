@@ -79,9 +79,13 @@ struct CoinFlipView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
     @State private var viewModel = CoinFlipViewModel()
     // Gentle idle float — makes the coin feel alive when nothing is happening
     @State private var idleFloat: CGFloat = 0
@@ -102,8 +106,7 @@ struct CoinFlipView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-            .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -180,17 +183,17 @@ struct CoinFlipView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("mode.coinFlip.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             Color.clear.frame(width: 40, height: 40)
         }
@@ -206,7 +209,7 @@ struct CoinFlipView: View {
                         .font(.system(size: fontSize * 0.9))
                     Text(lm.t(result.labelKey))
                         .font(.system(size: fontSize, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
                 .transition(.scale.combined(with: .opacity))
             } else {

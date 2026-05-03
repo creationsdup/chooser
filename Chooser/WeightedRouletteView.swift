@@ -168,12 +168,16 @@ struct WeightedRouletteView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("hapticsEnabled")   private var hapticsEnabled      = true
     @AppStorage("wheelColorStyle")  private var wheelColorStyleRaw  = WheelColorStyle.vivid.rawValue
     @AppStorage("pointerStyle")     private var pointerStyleRaw     = PointerStyle.pin.rawValue
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     private enum Phase { case setup, customize, wheel }
 
@@ -201,7 +205,7 @@ struct WeightedRouletteView: View {
             customizeScreen
         } else {
             ZStack {
-                theme.backgroundGradient.ignoresSafeArea()
+                GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
                 if isLandscape {
                     landscapeLayout
                 } else {
@@ -257,10 +261,10 @@ struct WeightedRouletteView: View {
                     Button { showOptions = true } label: {
                         Label(lm.t("weighted.options.title"), systemImage: "slider.horizontal.3")
                             .font(.system(size: 16, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(gameFg)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 13)
-                            .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(.pressable)
                     if viewModel.activeOptions.count >= 2 {
@@ -278,18 +282,18 @@ struct WeightedRouletteView: View {
 
     private var setupScreen: some View {
         ZStack {
-            theme.backgroundGradient.ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
             VStack(spacing: 0) {
                 // Back button row
                 HStack {
                     Button { dismiss() } label: {
                         ZStack {
                             Circle()
-                                .fill(.white.opacity(0.18))
+                                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                                 .frame(width: 40, height: 40)
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 16, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                         }
                     }
                     Spacer()
@@ -304,16 +308,16 @@ struct WeightedRouletteView: View {
                         VStack(spacing: 10) {
                             Image(systemName: "chart.pie.fill")
                                 .font(.system(size: 48))
-                                .foregroundStyle(.white.opacity(0.9))
+                                .foregroundStyle(gameFg.opacity(0.9))
                                 .shadow(color: theme.primary.opacity(0.6), radius: 16, y: 6)
 
                             Text(lm.t("weighted.setup.title"))
                                 .font(.system(size: 26, weight: .black, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
 
                             Text(lm.t("weighted.setup.subtitle"))
                                 .font(.system(size: 14, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.55))
+                                .foregroundStyle(gameFg.opacity(0.55))
                                 .multilineTextAlignment(.center)
                         }
                         .padding(.top, 16)
@@ -337,13 +341,13 @@ struct WeightedRouletteView: View {
                                     Text(lm.t("wheel.save.myWheels.button"))
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                 }
-                                .foregroundStyle(.white.opacity(0.85))
+                                .foregroundStyle(gameFg.opacity(0.85))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 14)
-                                .background(.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .stroke(.white.opacity(0.15), lineWidth: 1)
+                                        .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.15), lineWidth: 1)
                                 )
                             }
                             .buttonStyle(.pressable)
@@ -397,18 +401,20 @@ struct WeightedRouletteView: View {
 
     private func countCell(_ n: Int) -> some View {
         let isSelected = selectedCount == n
+        let idleFill: Color = isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.1)
+        let idleStroke: Color = isAtmosLight ? Color(hex: "1A1A2E").opacity(0.12) : Color.white.opacity(0.12)
         return Button { selectedCount = n } label: {
             Text("\(n)")
                 .font(.system(size: 30, weight: .black, design: .rounded))
-                .foregroundStyle(isSelected ? .white : .white.opacity(0.45))
+                .foregroundStyle(isSelected ? .white : gameFg.opacity(0.45))
                 .frame(width: 72, height: 72)
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(isSelected ? theme.primary.opacity(0.85) : .white.opacity(0.1))
+                        .fill(isSelected ? theme.primary.opacity(0.85) : idleFill)
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(isSelected ? theme.primary : .white.opacity(0.12), lineWidth: isSelected ? 2 : 1)
+                        .stroke(isSelected ? theme.primary : idleStroke, lineWidth: isSelected ? 2 : 1)
                 )
                 .shadow(color: isSelected ? theme.primary.opacity(0.5) : .clear, radius: 8, y: 4)
                 .scaleEffect(isSelected ? 1.06 : 1.0)
@@ -421,7 +427,7 @@ struct WeightedRouletteView: View {
 
     private var customizeScreen: some View {
         ZStack {
-            theme.backgroundGradient.ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
             VStack(spacing: 0) {
                 // Top bar
                 HStack {
@@ -432,17 +438,17 @@ struct WeightedRouletteView: View {
                     } label: {
                         ZStack {
                             Circle()
-                                .fill(.white.opacity(0.18))
+                                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                                 .frame(width: 40, height: 40)
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 16, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                         }
                     }
                     Spacer()
                     Text(lm.t("weighted.customize.title"))
                         .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                     Spacer()
                     // Balance the back button
                     Color.clear.frame(width: 40, height: 40)
@@ -486,12 +492,12 @@ struct WeightedRouletteView: View {
                             .font(.system(size: 20))
                         Text(lm.t("weighted.customize.start"))
                             .font(.system(size: 20, weight: .black, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(canStart ? .white : gameFg.opacity(0.4))
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 18)
                     .background(
-                        canStart ? theme.primary : Color.white.opacity(0.12),
+                        canStart ? theme.primary : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.12)),
                         in: RoundedRectangle(cornerRadius: 18, style: .continuous)
                     )
                     .shadow(color: canStart ? theme.primary.opacity(0.38) : .clear, radius: 12, y: 6)
@@ -542,29 +548,29 @@ struct WeightedRouletteView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("mode.weightedRoulette.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             HStack(spacing: 6) {
                 Button { showSaveSheet = true } label: {
                     Image(systemName: "square.and.arrow.down")
                         .font(.system(size: 20))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(gameFg.opacity(0.7))
                 }
                 .buttonStyle(.pressableLight)
                 Button { showOptions = true } label: {
                     Image(systemName: "slider.horizontal.3")
                         .font(.system(size: 20))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(gameFg.opacity(0.7))
                 }
                 .buttonStyle(.pressableLight)
             }
@@ -641,10 +647,10 @@ struct WeightedRouletteView: View {
         VStack(spacing: 14) {
             Image(systemName: "chart.pie")
                 .font(.system(size: 56))
-                .foregroundStyle(.white.opacity(0.25))
+                .foregroundStyle(gameFg.opacity(0.25))
             Text(lm.t("weighted.empty"))
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(gameFg.opacity(0.4))
                 .multilineTextAlignment(.center)
         }
         .frame(height: wheelSize)
@@ -655,7 +661,7 @@ struct WeightedRouletteView: View {
     private var optionsSheet: some View {
         NavigationStack {
             ZStack {
-                theme.backgroundGradient.ignoresSafeArea()
+                GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
                 ScrollView {
                     optionsSection
                         .padding(.horizontal, 16)
@@ -690,7 +696,7 @@ struct WeightedRouletteView: View {
                         .foregroundStyle(theme.primary)
                     Text(lm.t("weighted.probabilities"))
                         .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.4))
+                        .foregroundStyle(gameFg.opacity(0.4))
                         .kerning(0.8)
                 }
 
@@ -702,7 +708,7 @@ struct WeightedRouletteView: View {
                 HStack(spacing: 3) {
                     Text(lm.t("weighted.total"))
                         .font(.system(size: 12, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.35))
+                        .foregroundStyle(gameFg.opacity(0.35))
                     Text(String(format: "%.0f%%", total))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(isExact ? Color(hex: "4ECDC4") : Color(hex: "FFE66D"))
@@ -728,10 +734,10 @@ struct WeightedRouletteView: View {
                 VStack(spacing: 10) {
                     Image(systemName: "plus.circle.dashed")
                         .font(.system(size: 36))
-                        .foregroundStyle(.white.opacity(0.2))
+                        .foregroundStyle(gameFg.opacity(0.2))
                     Text(lm.t("weighted.options.empty"))
                         .font(.system(size: 14, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.35))
+                        .foregroundStyle(gameFg.opacity(0.35))
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
@@ -863,6 +869,10 @@ struct SimpleWeightedOptionRow: View {
     let onNameChange: (String) -> Void
     let onSetWeight: (Double) -> Void
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
     @State private var localName: String
 
     init(option: WeightedOption, color: Color,
@@ -889,7 +899,7 @@ struct SimpleWeightedOptionRow: View {
 
                 TextField(lm.t("weighted.option.placeholder"), text: $localName)
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                     .tint(color)
                     .onChange(of: localName) { _, v in onNameChange(v) }
 
@@ -910,7 +920,7 @@ struct SimpleWeightedOptionRow: View {
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(.white.opacity(0.08))
+                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -930,6 +940,10 @@ struct WeightedOptionRow: View {
     let onAdjustWeight: (Double) -> Void
     let onDelete: () -> Void
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var localName: String
 
@@ -957,7 +971,7 @@ struct WeightedOptionRow: View {
 
                 TextField(lm.t("weighted.option.placeholder"), text: $localName)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                     .tint(color)
                     .onChange(of: localName) { _, newValue in
                         onNameChange(newValue)
@@ -968,7 +982,7 @@ struct WeightedOptionRow: View {
                 Button(action: onDelete) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 18))
-                        .foregroundStyle(.white.opacity(0.25))
+                        .foregroundStyle(gameFg.opacity(0.25))
                 }
                 .buttonStyle(.pressableLight)
             }
@@ -984,7 +998,7 @@ struct WeightedOptionRow: View {
                 HStack(spacing: 2) {
                     Text(percentLabel)
                         .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .foregroundStyle(option.weight > 0 ? .white : .white.opacity(0.3))
+                        .foregroundStyle(option.weight > 0 ? gameFg : gameFg.opacity(0.3))
                         .contentTransition(.numericText())
                         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: option.weight)
                     Text("%")
@@ -1023,11 +1037,11 @@ struct WeightedOptionRow: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(.white.opacity(option.weight > 0 ? 0.08 : 0.04))
+                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(option.weight > 0 ? 0.06 : 0.03) : Color.white.opacity(option.weight > 0 ? 0.08 : 0.04))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(option.weight > 0 ? color.opacity(0.25) : .white.opacity(0.06), lineWidth: 1)
+                .stroke(option.weight > 0 ? color.opacity(0.25) : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.06)), lineWidth: 1)
         )
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: option.weight > 0)
     }
@@ -1177,22 +1191,26 @@ struct LoadWheelSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var wheels: [SavedWheel] = []
 
     var body: some View {
         NavigationStack {
             ZStack {
-                theme.backgroundGradient.ignoresSafeArea()
+                GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
                 Group {
                     if wheels.isEmpty {
                         VStack(spacing: 12) {
                             Image(systemName: "square.and.arrow.down")
                                 .font(.system(size: 44))
-                                .foregroundStyle(.white.opacity(0.2))
+                                .foregroundStyle(gameFg.opacity(0.2))
                             Text(lm.t("wheel.load.empty"))
                                 .font(.system(size: 15, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.35))
+                                .foregroundStyle(gameFg.opacity(0.35))
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
@@ -1213,21 +1231,21 @@ struct LoadWheelSheet: View {
                                             VStack(alignment: .leading, spacing: 3) {
                                                 Text(wheel.name)
                                                     .font(.system(size: 15, weight: .semibold, design: .rounded))
-                                                    .foregroundStyle(.white)
+                                                    .foregroundStyle(gameFg)
                                                 Text("\(wheel.optionNames.count) options")
                                                     .font(.system(size: 12, design: .rounded))
-                                                    .foregroundStyle(.white.opacity(0.4))
+                                                    .foregroundStyle(gameFg.opacity(0.4))
                                             }
                                             Spacer()
                                             Image(systemName: "chevron.right")
                                                 .font(.system(size: 12, weight: .semibold))
-                                                .foregroundStyle(.white.opacity(0.25))
+                                                .foregroundStyle(gameFg.opacity(0.25))
                                         }
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 13)
                                         .background(
                                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                                .fill(.white.opacity(0.08))
+                                                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.05) : Color.white.opacity(0.08))
                                         )
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 14, style: .continuous)
@@ -1256,7 +1274,7 @@ struct LoadWheelSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(lm.t("button.cancel")) { dismiss() }
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(gameFg.opacity(0.7))
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -1273,6 +1291,10 @@ struct SaveWheelSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var wheelName: String = ""
     @State private var savedWheels: [SavedWheel] = []
@@ -1281,24 +1303,24 @@ struct SaveWheelSheet: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                theme.backgroundGradient.ignoresSafeArea()
+                GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
                 ScrollView {
                     VStack(spacing: 20) {
                         // Save current wheel
                         VStack(spacing: 12) {
                             TextField(lm.t("wheel.save.namePlaceholder"), text: $wheelName)
                                 .font(.system(size: 16, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                                 .tint(theme.primary)
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 14)
                                 .background(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .fill(.white.opacity(0.1))
+                                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.1))
                                 )
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                        .stroke(.white.opacity(0.15), lineWidth: 1)
+                                        .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.15), lineWidth: 1)
                                 )
 
                             Button {
@@ -1341,7 +1363,7 @@ struct SaveWheelSheet: View {
                                 HStack {
                                     Text(lm.t("wheel.save.myWheels"))
                                         .font(.system(size: 12, weight: .bold, design: .rounded))
-                                        .foregroundStyle(.white.opacity(0.4))
+                                        .foregroundStyle(gameFg.opacity(0.4))
                                         .kerning(0.8)
                                     Spacer()
                                 }
@@ -1379,10 +1401,10 @@ struct SaveWheelSheet: View {
             VStack(alignment: .leading, spacing: 3) {
                 Text(wheel.name)
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                 Text("\(wheel.optionNames.count) options")
                     .font(.system(size: 12, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .foregroundStyle(gameFg.opacity(0.4))
             }
             Spacer()
             // Load button
@@ -1408,7 +1430,7 @@ struct SaveWheelSheet: View {
             } label: {
                 Image(systemName: "trash")
                     .font(.system(size: 14))
-                    .foregroundStyle(.white.opacity(0.3))
+                    .foregroundStyle(gameFg.opacity(0.3))
             }
             .buttonStyle(.pressableLight)
         }
@@ -1416,11 +1438,11 @@ struct SaveWheelSheet: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(.white.opacity(0.07))
+                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.05) : Color.white.opacity(0.07))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(.white.opacity(0.1), lineWidth: 1)
+                .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.1), lineWidth: 1)
         )
     }
 

@@ -48,9 +48,13 @@ struct NumberRouletteView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var viewModel = NumberRouletteViewModel()
     @FocusState private var focusedField: NumberField?
@@ -59,8 +63,7 @@ struct NumberRouletteView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-                .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -71,6 +74,7 @@ struct NumberRouletteView: View {
         .onTapGesture { focusedField = nil }
         .fullScreenCover(isPresented: $showModePicker) {
             NumberModePickerSheet()
+                .preferredColorScheme(appearance.resolvedScheme)
         }
     }
 
@@ -120,11 +124,11 @@ struct NumberRouletteView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.22))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.22))
                         .frame(width: 42, height: 42)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             .padding(.leading, 20)
@@ -133,7 +137,7 @@ struct NumberRouletteView: View {
 
             Text(lm.t("mode.numberRoulette.title"))
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
                 .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
 
             Spacer()
@@ -141,11 +145,11 @@ struct NumberRouletteView: View {
             Button { showModePicker = true } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.22))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.22))
                         .frame(width: 42, height: 42)
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             .padding(.trailing, 20)
@@ -168,7 +172,7 @@ struct NumberRouletteView: View {
 
             Text("–")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
 
             BoundTextField(
                 value: $viewModel.maxValue,
@@ -486,13 +490,17 @@ struct BoundTextField<F: Hashable>: View {
     var focusState: FocusState<F?>.Binding
     var fieldTag: F
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var editingText = ""
 
     var body: some View {
         TextField("", text: $editingText)
             .font(.system(size: 22, weight: .bold, design: .rounded))
-            .foregroundStyle(.white)
+            .foregroundStyle(gameFg)
             .multilineTextAlignment(.center)
             .keyboardType(.numberPad)
             .focused(focusState, equals: fieldTag)
@@ -501,10 +509,10 @@ struct BoundTextField<F: Hashable>: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(.white.opacity(0.18))
+                    .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                     .overlay(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(.white.opacity(0.55), lineWidth: 1.5)
+                            .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.35) : Color.white.opacity(0.55), lineWidth: 1.5)
                     )
             )
             .onAppear { editingText = "\(value)" }

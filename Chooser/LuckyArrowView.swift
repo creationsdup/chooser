@@ -145,9 +145,13 @@ struct LuckyArrowView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var viewModel = LuckyArrowViewModel()
     @State private var subMode: ArrowSubMode = .arrow
@@ -156,8 +160,7 @@ struct LuckyArrowView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-                .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -229,7 +232,7 @@ struct LuckyArrowView: View {
                 } label: {
                     Text(lm.t(mode.labelKey))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(subMode == mode ? theme.primary : .white.opacity(0.75))
+                        .foregroundStyle(subMode == mode ? theme.primary : gameFg.opacity(0.75))
                         .padding(.vertical, 8)
                         .padding(.horizontal, 22)
                         .background(
@@ -243,7 +246,7 @@ struct LuckyArrowView: View {
             }
         }
         .padding(4)
-        .background(Capsule().fill(.white.opacity(0.15)))
+        .background(Capsule().fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.15)))
         .padding(.horizontal, 48)
         .padding(.top, 10)
         .padding(.bottom, 4)
@@ -256,11 +259,11 @@ struct LuckyArrowView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.22))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.22))
                         .frame(width: 42, height: 42)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             .padding(.leading, 20)
@@ -269,7 +272,7 @@ struct LuckyArrowView: View {
 
             Text(lm.t("mode.luckyArrow.title"))
                 .font(.system(size: 22, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
                 .shadow(color: .black.opacity(0.12), radius: 2, y: 1)
 
             Spacer()

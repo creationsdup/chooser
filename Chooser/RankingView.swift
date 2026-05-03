@@ -95,6 +95,10 @@ final class RankingViewModel {
 private struct RankingCardView: View {
     let item: RankedItem
     let badgeColor: Color
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     var body: some View {
         HStack(spacing: 14) {
@@ -102,14 +106,14 @@ private struct RankingCardView: View {
             // ── Badge ──────────────────────────────────────────────────────
             ZStack {
                 Circle()
-                    .fill(item.isRevealed ? badgeColor.opacity(0.25) : .white.opacity(0.06))
+                    .fill(item.isRevealed ? badgeColor.opacity(0.25) : gameFg.opacity(0.06))
                     .frame(width: 46, height: 46)
 
                 // Plain number — always present, changes style
                 if item.position > 3 || !item.isRevealed {
                     Text("\(item.position)")
                         .font(.system(size: 15, weight: .black, design: .rounded))
-                        .foregroundStyle(item.isRevealed ? badgeColor : .white.opacity(0.2))
+                        .foregroundStyle(item.isRevealed ? badgeColor : gameFg.opacity(0.2))
                         .opacity(item.isRevealed && item.position <= 3 ? 0 : 1)
                 }
 
@@ -128,7 +132,7 @@ private struct RankingCardView: View {
                 HStack(spacing: 5) {
                     ForEach(0..<3, id: \.self) { _ in
                         Circle()
-                            .fill(.white.opacity(0.15))
+                            .fill(gameFg.opacity(0.15))
                             .frame(width: 5, height: 5)
                     }
                 }
@@ -141,7 +145,7 @@ private struct RankingCardView: View {
                         weight: item.position == 1 ? .black : .semibold,
                         design: .rounded
                     ))
-                    .foregroundStyle(item.position == 1 ? Color(hex: "FBBF24") : .white)
+                    .foregroundStyle(item.position == 1 ? Color(hex: "FBBF24") : gameFg)
                     .lineLimit(2)
                     .opacity(item.isRevealed ? 1 : 0)
                     .offset(x: item.isRevealed ? 0 : 8)
@@ -166,7 +170,7 @@ private struct RankingCardView: View {
                 .fill(cardFill)
                 .overlay(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(item.isRevealed ? badgeColor.opacity(0.3) : .white.opacity(0.06), lineWidth: 1)
+                        .stroke(item.isRevealed ? badgeColor.opacity(0.3) : gameFg.opacity(0.06), lineWidth: 1)
                 )
         )
         .shadow(
@@ -177,8 +181,8 @@ private struct RankingCardView: View {
     }
 
     private var cardFill: Color {
-        guard item.isRevealed else { return .white.opacity(0.04) }
-        return item.position == 1 ? Color(hex: "FBBF24").opacity(0.11) : .white.opacity(0.07)
+        guard item.isRevealed else { return gameFg.opacity(0.04) }
+        return item.position == 1 ? Color(hex: "FBBF24").opacity(0.11) : gameFg.opacity(0.07)
     }
 
     private func medal(_ pos: Int) -> String {
@@ -199,6 +203,10 @@ private struct DirectEntryPanelView: View {
     let theme: AppTheme
     let lm: LanguageManager
     @Binding var showSaveSheet: Bool
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var text = ""
     @FocusState private var focused: Bool
@@ -209,7 +217,7 @@ private struct DirectEntryPanelView: View {
             HStack(spacing: 8) {
                 TextField(lm.t("ranking.direct.placeholder"), text: $text)
                     .font(.system(size: 15, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                     .tint(theme.primary)
                     .submitLabel(.return)
                     .focused($focused)
@@ -232,8 +240,8 @@ private struct DirectEntryPanelView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))
+            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.12), lineWidth: 1))
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: text.isEmpty)
 
             // Entries list
@@ -247,7 +255,7 @@ private struct DirectEntryPanelView: View {
                                     .frame(width: 7, height: 7)
                                 Text(entry)
                                     .font(.system(size: 14, design: .rounded))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(gameFg)
                                     .lineLimit(1)
                                 Spacer()
                                 Button {
@@ -257,13 +265,13 @@ private struct DirectEntryPanelView: View {
                                 } label: {
                                     Image(systemName: "xmark")
                                         .font(.system(size: 11, weight: .semibold))
-                                        .foregroundStyle(.white.opacity(0.35))
+                                        .foregroundStyle(gameFg.opacity(0.35))
                                         .padding(5)
                                 }
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 7)
-                            .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.05) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
                     }
                 }
@@ -302,9 +310,13 @@ struct RankingView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @Query private var lists: [ChoiceList]
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var viewModel = RankingViewModel()
     @State private var selectedList: ChoiceList? = nil
@@ -323,7 +335,7 @@ struct RankingView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient.ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
             portraitLayout
         }
         .onAppear {
@@ -386,17 +398,17 @@ struct RankingView: View {
             } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("mode.ranking.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             itemCountBadge
         }
@@ -436,10 +448,10 @@ struct RankingView: View {
                     )
                 Text(lm.t("ranking.ready.title"))
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.85))
+                    .foregroundStyle(gameFg.opacity(0.85))
                 Text(lm.t("ranking.ready.subtitle"))
                     .font(.system(size: 13, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.45))
+                    .foregroundStyle(gameFg.opacity(0.45))
                     .multilineTextAlignment(.center)
             }
             ScrollView(.horizontal, showsIndicators: false) {
@@ -447,10 +459,10 @@ struct RankingView: View {
                     ForEach(validItems, id: \.self) { item in
                         Text(item)
                             .font(.system(size: 13, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(gameFg.opacity(0.7))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
-                            .background(.white.opacity(0.1), in: Capsule())
+                            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.07) : Color.white.opacity(0.1), in: Capsule())
                     }
                 }
                 .padding(.horizontal, 2)
@@ -496,7 +508,7 @@ struct RankingView: View {
                 } label: {
                     Text(lm.t(mode.labelKey))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(viewModel.inputMode == mode ? .white : .white.opacity(0.45))
+                        .foregroundStyle(viewModel.inputMode == mode ? .white : gameFg.opacity(0.45))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                         .background(
@@ -507,8 +519,8 @@ struct RankingView: View {
                 }
             }
         }
-        .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.1), lineWidth: 1))
+        .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
@@ -538,16 +550,16 @@ struct RankingView: View {
                 Text(selectedList?.name ?? lm.t("draw.pickList"))
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .lineLimit(1)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.35))
+                    .foregroundStyle(gameFg.opacity(0.35))
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.1), lineWidth: 1))
+            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
         }
     }
 

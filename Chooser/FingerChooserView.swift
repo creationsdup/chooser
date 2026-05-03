@@ -775,22 +775,25 @@ struct FingerChooserView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
     @State private var viewModel = FingerChooserViewModel()
     @State private var flashOpacity: Double = 0
     @State private var showModeSelection = true
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-            .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             // Background countdown number
             if case .countdown(let n) = viewModel.state {
                 Text("\(n)")
                     .font(.system(size: 380, weight: .black, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.06))
+                    .foregroundStyle(gameFg.opacity(0.06))
                     .allowsHitTesting(false)
                     .transition(.opacity)
                     .id("bg_countdown_\(n)")
@@ -852,11 +855,11 @@ struct FingerChooserView: View {
                     Button { dismiss() } label: {
                         ZStack {
                             Circle()
-                                .fill(.white.opacity(0.18))
+                                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                                 .frame(width: 40, height: 40)
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 16, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                         }
                     }
                     Spacer()
@@ -917,10 +920,10 @@ struct FingerChooserView: View {
                     VStack(spacing: 14) {
                         Image(systemName: "hand.point.up.left.fill")
                             .font(.system(size: 52))
-                            .foregroundStyle(.white.opacity(0.45))
+                            .foregroundStyle(gameFg.opacity(0.45))
                         Text(waitingText)
                             .font(.system(size: 22, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.82))
+                            .foregroundStyle(gameFg.opacity(0.82))
                             .multilineTextAlignment(.center)
                         modeBadge
                     }
@@ -930,10 +933,10 @@ struct FingerChooserView: View {
             case .holding:
                 Text(String(format: lm.t("finger.detected"), viewModel.touchPositions.count, viewModel.touchPositions.count == 1 ? "" : "s", viewModel.touchPositions.count == 1 ? "" : "s"))
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                     .padding(.horizontal, 22)
                     .padding(.vertical, 10)
-                    .background(.white.opacity(0.12), in: Capsule())
+                    .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.12), in: Capsule())
                     .transition(.opacity.combined(with: .scale(scale: 0.85)))
 
             case .countdown, .selecting:
@@ -953,8 +956,7 @@ struct FingerChooserView: View {
 
     private var modeSelectionOverlay: some View {
         ZStack {
-            theme.backgroundGradient
-                .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             VStack(spacing: 0) {
                 // Top bar
@@ -962,11 +964,11 @@ struct FingerChooserView: View {
                     Button { dismiss() } label: {
                         ZStack {
                             Circle()
-                                .fill(.white.opacity(0.18))
+                                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                                 .frame(width: 40, height: 40)
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 16, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                         }
                     }
                     Spacer()
@@ -978,10 +980,10 @@ struct FingerChooserView: View {
                 VStack(spacing: 6) {
                     Text(lm.t("finger.mode.section"))
                         .font(.system(size: 28, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                     Text(lm.t("finger.mode.subtitle"))
                         .font(.system(size: 14, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(gameFg.opacity(0.5))
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
@@ -1012,11 +1014,11 @@ struct FingerChooserView: View {
                                 VStack(alignment: .center, spacing: 6) {
                                     Text(lm.t(mode.titleKey))
                                         .font(.system(size: 17, weight: .bold, design: .rounded))
-                                        .foregroundStyle(.white)
+                                        .foregroundStyle(gameFg)
                                         .multilineTextAlignment(.center)
                                     Text(lm.t(mode.descriptionKey))
                                         .font(.system(size: 13, design: .rounded))
-                                        .foregroundStyle(.white.opacity(0.6))
+                                        .foregroundStyle(gameFg.opacity(0.6))
                                         .lineSpacing(3)
                                         .multilineTextAlignment(.center)
                                         .fixedSize(horizontal: false, vertical: true)
@@ -1034,10 +1036,10 @@ struct FingerChooserView: View {
                             .padding(.vertical, 16)
                             .background(
                                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .fill(isSelected ? theme.primary.opacity(0.15) : .white.opacity(0.07))
+                                    .fill(isSelected ? theme.primary.opacity(0.15) : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.07)))
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                            .stroke(isSelected ? theme.primary.opacity(0.5) : .white.opacity(0.09), lineWidth: 1.5)
+                                            .stroke(isSelected ? theme.primary.opacity(0.5) : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.09)), lineWidth: 1.5)
                                     )
                             )
                         }
@@ -1052,7 +1054,7 @@ struct FingerChooserView: View {
                         VStack(spacing: 10) {
                             Text(lm.t("finger.winners.title"))
                                 .font(.system(size: 13, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.55))
+                                .foregroundStyle(gameFg.opacity(0.55))
                                 .frame(maxWidth: .infinity, alignment: .leading)
 
                             HStack(spacing: 10) {
@@ -1066,15 +1068,15 @@ struct FingerChooserView: View {
                                     } label: {
                                         Text("\(n)")
                                             .font(.system(size: 18, weight: .bold, design: .rounded))
-                                            .foregroundStyle(isCountSelected ? theme.primary : .white.opacity(0.5))
+                                            .foregroundStyle(isCountSelected ? theme.primary : gameFg.opacity(0.5))
                                             .frame(maxWidth: .infinity)
                                             .padding(.vertical, 12)
                                             .background(
                                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                                    .fill(isCountSelected ? theme.primary.opacity(0.20) : .white.opacity(0.06))
+                                                    .fill(isCountSelected ? theme.primary.opacity(0.20) : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.05) : Color.white.opacity(0.06)))
                                                     .overlay(
                                                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                                            .stroke(isCountSelected ? theme.primary.opacity(0.6) : .white.opacity(0.08), lineWidth: 1.5)
+                                                            .stroke(isCountSelected ? theme.primary.opacity(0.6) : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.08)), lineWidth: 1.5)
                                                     )
                                             )
                                     }
@@ -1117,17 +1119,17 @@ struct FingerChooserView: View {
             Text(lm.t(viewModel.mode?.titleKey ?? "finger.mode.classic"))
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
         }
-        .foregroundStyle(.white.opacity(0.6))
+        .foregroundStyle(gameFg.opacity(0.6))
         .padding(.horizontal, 14)
         .padding(.vertical, 7)
-        .background(.white.opacity(0.10), in: Capsule())
+        .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.10), in: Capsule())
     }
 
     private var resetButton: some View {
         Button { viewModel.reset() } label: {
             Image(systemName: "arrow.counterclockwise.circle.fill")
                 .font(.system(size: 64))
-                .foregroundStyle(.white.opacity(0.85))
+                .foregroundStyle(gameFg.opacity(0.85))
                 .shadow(color: Color(hex: "A855F7").opacity(0.8), radius: 20)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.85)))

@@ -48,9 +48,13 @@ struct NumberRouletteClassicView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var viewModel = NumberRouletteClassicViewModel()
     @FocusState private var focusedField: ClassicField?
@@ -62,8 +66,7 @@ struct NumberRouletteClassicView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-            .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -74,6 +77,7 @@ struct NumberRouletteClassicView: View {
         .onTapGesture { focusedField = nil }
         .fullScreenCover(isPresented: $showModePicker) {
             NumberModePickerSheet()
+                .preferredColorScheme(appearance.resolvedScheme)
         }
     }
 
@@ -131,22 +135,22 @@ struct NumberRouletteClassicView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("numberroulette.classic.title"))
                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             Button { showModePicker = true } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(gameFg.opacity(0.7))
                     .frame(width: 28, height: 28)
             }
         }
@@ -173,7 +177,7 @@ struct NumberRouletteClassicView: View {
 
             Image(systemName: "arrow.right")
                 .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.4))
+                .foregroundStyle(gameFg.opacity(0.4))
 
             ClassicRangePicker(
                 label: lm.t("numberroulette.range.to"),
@@ -206,7 +210,7 @@ struct NumberRouletteClassicView: View {
 
             Text("\(viewModel.displayedNumber)")
                 .font(.system(size: 128, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
                 .contentTransition(.numericText(countsDown: false))
                 .animation(.easeOut(duration: 0.05), value: viewModel.displayedNumber)
                 .blur(radius: viewModel.isSpinning ? 1.5 : 0)
@@ -267,6 +271,10 @@ private struct ClassicRangePicker<F: Hashable>: View {
     var focusState: FocusState<F?>.Binding
     var fieldTag: F
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var editingText = ""
 
@@ -274,7 +282,7 @@ private struct ClassicRangePicker<F: Hashable>: View {
         VStack(spacing: 6) {
             Text(label)
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.55))
+                .foregroundStyle(gameFg.opacity(0.55))
 
             HStack(spacing: 0) {
                 Button {
@@ -283,7 +291,7 @@ private struct ClassicRangePicker<F: Hashable>: View {
                 } label: {
                     Image(systemName: "minus")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(gameFg.opacity(0.7))
                         .frame(width: 36, height: 44)
                         .contentShape(Rectangle())
                 }
@@ -291,7 +299,7 @@ private struct ClassicRangePicker<F: Hashable>: View {
 
                 TextField("", text: $editingText)
                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                     .multilineTextAlignment(.center)
                     .keyboardType(.numberPad)
                     .focused(focusState, equals: fieldTag)
@@ -303,7 +311,7 @@ private struct ClassicRangePicker<F: Hashable>: View {
                 } label: {
                     Image(systemName: "plus")
                         .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(gameFg.opacity(0.7))
                         .frame(width: 36, height: 44)
                         .contentShape(Rectangle())
                 }
@@ -312,7 +320,7 @@ private struct ClassicRangePicker<F: Hashable>: View {
             .background(
                 ZStack {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(.white.opacity(0.08))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08))
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .stroke(color.opacity(0.4), lineWidth: 1)
                 }
@@ -367,11 +375,14 @@ struct NumberModePickerSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-                .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             VStack(spacing: 0) {
                 // ── Header ────────────────────────────────────────────
@@ -379,16 +390,16 @@ struct NumberModePickerSheet: View {
                     Spacer()
                     Text(lm.t("numberroulette.mode.title"))
                         .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                     Spacer()
                     Button { dismiss() } label: {
                         ZStack {
                             Circle()
-                                .fill(.white.opacity(0.18))
+                                .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                                 .frame(width: 40, height: 40)
                             Image(systemName: "xmark")
                                 .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                         }
                     }
                 }
@@ -398,7 +409,7 @@ struct NumberModePickerSheet: View {
 
                 Text(lm.t("numberroulette.mode.hint"))
                     .font(.system(size: 14, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.65))
+                    .foregroundStyle(gameFg.opacity(0.65))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 28)
                     .padding(.vertical, 16)
@@ -444,6 +455,10 @@ private struct ModeOptionCard: View {
     let gradient: [Color]
     let isSelected: Bool
     let action: () -> Void
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     var body: some View {
         Button(action: action) {
@@ -464,10 +479,10 @@ private struct ModeOptionCard: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(title)
                             .font(.system(size: 16, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(gameFg)
                         Text(description)
                             .font(.system(size: 13, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.65))
+                            .foregroundStyle(gameFg.opacity(0.65))
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     Spacer(minLength: 10)
@@ -479,13 +494,13 @@ private struct ModeOptionCard: View {
                     }
                 }
                 .padding(14)
-                .background(.white.opacity(0.08))
+                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08))
             }
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(
-                        isSelected ? gradient[0] : Color.white.opacity(0.15),
+                        isSelected ? gradient[0] : (isAtmosLight ? Color(hex: "1A1A2E").opacity(0.12) : Color.white.opacity(0.15)),
                         lineWidth: isSelected ? 2.5 : 1
                     )
             )

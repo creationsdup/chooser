@@ -69,12 +69,16 @@ struct RandomDrawView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @Environment(\.modelContext) private var modelContext
     @Query private var lists: [ChoiceList]
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var viewModel = RandomDrawViewModel()
     @State private var selectedList: ChoiceList? = nil
@@ -98,8 +102,7 @@ struct RandomDrawView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-            .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -224,15 +227,15 @@ struct RandomDrawView: View {
                         VStack(spacing: 7) {
                             Image(systemName: "hand.tap.fill")
                                 .font(.system(size: 24))
-                                .foregroundStyle(.white.opacity(0.22))
+                                .foregroundStyle(gameFg.opacity(0.22))
                             Text(lm.t("draw.ready"))
                                 .font(.system(size: 13, weight: .medium, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.25))
+                                .foregroundStyle(gameFg.opacity(0.25))
                         }
                     } else {
                         Text(centerText)
                             .font(.system(size: 26, weight: .black, design: .rounded))
-                            .foregroundStyle(isResult ? Color(hex: "FFE66D") : .white)
+                            .foregroundStyle(isResult ? Color(hex: "FFE66D") : gameFg)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                             .padding(.horizontal, 24)
@@ -326,7 +329,7 @@ struct RandomDrawView: View {
         ZStack {
             Text(text)
                 .font(.system(size: size, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(opacity))
+                .foregroundStyle(gameFg.opacity(opacity))
                 .lineLimit(1)
                 .padding(.horizontal, 24)
                 .id(text)
@@ -377,17 +380,17 @@ struct RandomDrawView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("mode.randomDraw.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             itemCountBadge
         }
@@ -401,7 +404,7 @@ struct RandomDrawView: View {
         if !validItems.isEmpty {
             Text("\(validItems.count)")
                 .font(.system(size: 13, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(isAtmosLight ? theme.primary : .white)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .background(theme.primary.opacity(0.3), in: Capsule())
@@ -424,7 +427,7 @@ struct RandomDrawView: View {
                 } label: {
                     Text(lm.t(mode.labelKey))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(viewModel.inputMode == mode ? .white : .white.opacity(0.45))
+                        .foregroundStyle(viewModel.inputMode == mode ? .white : gameFg.opacity(0.45))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                         .background(
@@ -435,8 +438,8 @@ struct RandomDrawView: View {
                 }
             }
         }
-        .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.1), lineWidth: 1))
+        .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
@@ -459,16 +462,16 @@ struct RandomDrawView: View {
                 Text(selectedList?.name ?? lm.t("draw.pickList"))
                     .font(.system(size: 15, weight: .semibold, design: .rounded))
                     .lineLimit(1)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.35))
+                    .foregroundStyle(gameFg.opacity(0.35))
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.1), lineWidth: 1))
+            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
         }
     }
 
@@ -479,7 +482,7 @@ struct RandomDrawView: View {
             HStack(spacing: 8) {
                 TextField(lm.t("draw.direct.placeholder"), text: $newEntryText)
                     .font(.system(size: 15, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
                     .tint(theme.primary)
                     .submitLabel(.return)
                     .focused($entryFieldFocused)
@@ -502,8 +505,8 @@ struct RandomDrawView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.white.opacity(0.12), lineWidth: 1))
+            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.12) : Color.white.opacity(0.12), lineWidth: 1))
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: newEntryText.isEmpty)
 
             // Entries list
@@ -518,7 +521,7 @@ struct RandomDrawView: View {
                                     .frame(width: 7, height: 7)
                                 Text(entry)
                                     .font(.system(size: 14, design: .rounded))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(gameFg)
                                     .lineLimit(1)
                                 Spacer()
                                 Button {
@@ -528,13 +531,13 @@ struct RandomDrawView: View {
                                 } label: {
                                     Image(systemName: "xmark")
                                         .font(.system(size: 11, weight: .semibold))
-                                        .foregroundStyle(.white.opacity(0.35))
+                                        .foregroundStyle(gameFg.opacity(0.35))
                                         .padding(5)
                                 }
                             }
                             .padding(.horizontal, 12)
                             .padding(.vertical, 7)
-                            .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.05) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
                     }
                 }
@@ -575,7 +578,7 @@ struct RandomDrawView: View {
                     .fill(.ultraThinMaterial.opacity(0.15))
                     .overlay {
                         RoundedRectangle(cornerRadius: 26, style: .continuous)
-                            .stroke(.white.opacity(0.12), lineWidth: 1.5)
+                            .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.12), lineWidth: 1.5)
                     }
                     .innerHighlight(cornerRadius: 26, intensity: 0.10)
                     .shadow(
@@ -591,10 +594,10 @@ struct RandomDrawView: View {
                         VStack(spacing: 8) {
                             Text("?")
                                 .font(.system(size: 64, weight: .black, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.18))
+                                .foregroundStyle(gameFg.opacity(0.18))
                             Text(lm.t("draw.ready"))
                                 .font(.system(size: 14, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.3))
+                                .foregroundStyle(gameFg.opacity(0.3))
                         }
                     } else if let res = viewModel.result {
                         // Result state
@@ -603,7 +606,7 @@ struct RandomDrawView: View {
                                 .font(.system(size: 36))
                             Text(res)
                                 .font(.system(size: 32, weight: .black, design: .rounded))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(gameFg)
                                 .multilineTextAlignment(.center)
                                 .padding(.horizontal, 20)
                                 .shadow(color: theme.primary.opacity(0.6), radius: 10)
@@ -616,7 +619,7 @@ struct RandomDrawView: View {
                         // Animating
                         Text(viewModel.displayedItem)
                             .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(gameFg)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 20)
                             .id(viewModel.displayedItem)
@@ -640,10 +643,10 @@ struct RandomDrawView: View {
                         ForEach(validItems, id: \.self) { item in
                             Text(item)
                                 .font(.system(size: 12, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.6))
+                                .foregroundStyle(gameFg.opacity(0.6))
                                 .padding(.horizontal, 11)
                                 .padding(.vertical, 5)
-                                .background(.white.opacity(0.09), in: Capsule())
+                                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09), in: Capsule())
                         }
                     }
                     .padding(.horizontal, 28)
@@ -694,23 +697,23 @@ struct RandomDrawView: View {
         VStack(spacing: 16) {
             Image(systemName: "ticket")
                 .font(.system(size: 56))
-                .foregroundStyle(.white.opacity(0.3))
+                .foregroundStyle(gameFg.opacity(0.3))
             switch viewModel.inputMode {
             case .savedList:
                 Text(lists.isEmpty
                      ? lm.t("draw.empty.noLists")
                      : lm.t("draw.empty.listEmpty"))
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(gameFg.opacity(0.5))
                     .multilineTextAlignment(.center)
             case .directEntry:
                 VStack(spacing: 6) {
                     Text(lm.t("draw.empty.noEntries"))
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(gameFg.opacity(0.5))
                     Text(lm.t("draw.empty.noEntries.hint"))
                         .font(.system(size: 14, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(gameFg.opacity(0.3))
                         .multilineTextAlignment(.center)
                 }
             }

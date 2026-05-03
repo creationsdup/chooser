@@ -158,7 +158,8 @@ struct HomeView: View {
                 }
                 .ignoresSafeArea()
             } else {
-                Color(.systemGroupedBackground)
+                Color(colorScheme == .dark ? UIColor.systemGroupedBackground : UIColor.systemBackground)
+                    .ignoresSafeArea()
             }
         }
         .fullScreenCover(item: $selectedMode) { mode in
@@ -166,6 +167,7 @@ struct HomeView: View {
                 .environment(lm)
                 .environment(appearance)
                 .environment(\.appTheme, appearance.resolvedTheme)
+                .preferredColorScheme(appearance.resolvedScheme)
         }
     }
 
@@ -266,7 +268,6 @@ struct PickerModeCard: View {
 
     private var atmosFeaturedCard: some View {
         ZStack(alignment: .bottomLeading) {
-            // Background
             if isDark {
                 Color(hex: "161A24")
                 LinearGradient(
@@ -278,118 +279,118 @@ struct PickerModeCard: View {
                     endPoint: .bottomTrailing
                 )
             } else {
+                // Pastel light — fond blanc + teinte pastel de la couleur du mode
                 Color.white
+                mode.gradient[0].opacity(0.10)
                 LinearGradient(
                     stops: [
-                        .init(color: mode.gradient[0].opacity(0.10), location: 0),
-                        .init(color: mode.gradient[1].opacity(0.05), location: 1)
+                        .init(color: mode.gradient[0].opacity(0.22), location: 0),
+                        .init(color: mode.gradient[1].opacity(0.12), location: 1)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
             }
 
-            // Glow bottom-right
-            Circle()
-                .fill(mode.gradient[0].opacity(isDark ? 0.15 : 0.08))
-                .frame(width: 140, height: 140)
-                .blur(radius: 14)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                .offset(x: 40, y: 40)
+            // Decorative oversized icon
+            Image(systemName: mode.systemImage)
+                .font(.system(size: 100))
+                .foregroundStyle(mode.gradient[0].opacity(isDark ? 0.12 : 0.18))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .padding(14)
+                .offset(x: 10, y: -6)
 
-            VStack(alignment: .leading, spacing: 0) {
-                ZStack {
-                    LinearGradient(colors: mode.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: mode.systemImage)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-                .frame(width: 40, height: 40)
-                .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .shadow(color: mode.gradient[0].opacity(0.33), radius: 7, x: 0, y: 3)
-
-                Spacer(minLength: 12)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 14.5, weight: .black, design: .rounded))
-                        .foregroundStyle(isDark ? .white : Color(hex: "1A1A2E"))
-                        .lineLimit(1)
-                    Text(subtitle)
-                        .font(.system(size: 11.5, design: .rounded))
-                        .foregroundStyle(isDark ? .white.opacity(0.6) : Color(hex: "1A1A2E").opacity(0.50))
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+            VStack(alignment: .leading, spacing: 5) {
+                Image(systemName: mode.systemImage)
+                    .font(.system(size: 32, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: isDark ? mode.gradient : [mode.gradient[0].opacity(0.75), mode.gradient[1].opacity(0.75)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                Text(title)
+                    .font(.system(size: 21, weight: .bold, design: .rounded))
+                    .foregroundStyle(isDark ? .white : Color(hex: "1A1A2E"))
+                    .lineLimit(1)
+                Text(subtitle)
+                    .font(.system(size: 13, design: .rounded))
+                    .foregroundStyle(isDark ? .white.opacity(0.6) : Color(hex: "1A1A2E").opacity(0.45))
+                    .lineLimit(2)
             }
-            .padding(16)
+            .padding(20)
         }
-        .frame(maxWidth: .infinity, minHeight: 130)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .aspectRatio(2.2, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(mode.gradient[0].opacity(isDark ? 0.20 : 0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(mode.gradient[0].opacity(isDark ? 0.20 : 0.18), lineWidth: 1)
         )
-        .shadow(color: mode.gradient[0].opacity(isDark ? 0.33 : 0.15), radius: isDark ? 20 : 10, x: 0, y: isDark ? 8 : 4)
+        .shadow(
+            color: mode.gradient[0].opacity(isDark ? 0.33 : 0.10),
+            radius: isDark ? 20 : 8,
+            x: 0, y: isDark ? 8 : 3
+        )
     }
 
     private var atmosTileCard: some View {
         ZStack(alignment: .bottomLeading) {
-            // Background
             if isDark {
                 Color(hex: "161A24")
             } else {
                 Color.white
+                mode.gradient[0].opacity(0.10)
             }
 
             LinearGradient(
                 stops: [
-                    .init(color: mode.gradient[0].opacity(isDark ? 0.19 : 0.10), location: 0),
-                    .init(color: mode.gradient[1].opacity(isDark ? 0.09 : 0.05), location: 1)
+                    .init(color: mode.gradient[0].opacity(isDark ? 0.19 : 0.22), location: 0),
+                    .init(color: mode.gradient[1].opacity(isDark ? 0.09 : 0.12), location: 1)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
 
-            Circle()
-                .fill(mode.gradient[0].opacity(isDark ? 0.15 : 0.08))
-                .frame(width: 90, height: 90)
-                .blur(radius: 10)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                .offset(x: 30, y: 30)
+            // Decorative oversized icon
+            Image(systemName: mode.systemImage)
+                .font(.system(size: 68))
+                .foregroundStyle(mode.gradient[0].opacity(isDark ? 0.12 : 0.18))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                .padding(8)
+                .offset(x: 10, y: -6)
 
-            VStack(alignment: .leading, spacing: 0) {
-                ZStack {
-                    LinearGradient(colors: mode.gradient, startPoint: .topLeading, endPoint: .bottomTrailing)
-                    Image(systemName: mode.systemImage)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-                .frame(width: 40, height: 40)
-                .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
-                .shadow(color: mode.gradient[0].opacity(0.33), radius: 7, x: 0, y: 3)
-
-                Spacer(minLength: 12)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 14.5, weight: .black, design: .rounded))
-                        .foregroundStyle(isDark ? .white : Color(hex: "1A1A2E"))
-                        .lineLimit(1)
-                    Text(subtitle)
-                        .font(.system(size: 11.5, design: .rounded))
-                        .foregroundStyle(isDark ? .white.opacity(0.6) : Color(hex: "1A1A2E").opacity(0.50))
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+            VStack(alignment: .leading, spacing: 5) {
+                Image(systemName: mode.systemImage)
+                    .font(.system(size: 26, weight: .semibold))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: isDark ? mode.gradient : [mode.gradient[0].opacity(0.75), mode.gradient[1].opacity(0.75)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                Text(title)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(isDark ? .white : Color(hex: "1A1A2E"))
+                    .lineLimit(1)
+                Text(subtitle)
+                    .font(.system(size: 11, design: .rounded))
+                    .foregroundStyle(isDark ? .white.opacity(0.6) : Color(hex: "1A1A2E").opacity(0.45))
+                    .lineLimit(2)
             }
-            .padding(16)
+            .padding(14)
         }
-        .aspectRatio(1.05, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .aspectRatio(1.15, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(mode.gradient[0].opacity(isDark ? 0.20 : 0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(mode.gradient[0].opacity(isDark ? 0.20 : 0.18), lineWidth: 1)
+        )
+        .shadow(
+            color: mode.gradient[0].opacity(isDark ? 0.25 : 0.10),
+            radius: isDark ? 12 : 6,
+            x: 0, y: isDark ? 5 : 2
         )
     }
 

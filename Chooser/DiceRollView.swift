@@ -113,15 +113,18 @@ struct DiceRollView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
     @State private var viewModel = DiceViewModel()
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-            .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -171,17 +174,17 @@ struct DiceRollView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("mode.dice.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             // balance
             Color.clear.frame(width: 40, height: 40)
@@ -196,19 +199,19 @@ struct DiceRollView: View {
             Button { viewModel.removeDie() } label: {
                 Image(systemName: "minus.circle.fill")
                     .font(.system(size: 30))
-                    .foregroundStyle(viewModel.diceCount <= 1 ? .white.opacity(0.25) : .white.opacity(0.8))
+                    .foregroundStyle(viewModel.diceCount <= 1 ? gameFg.opacity(0.25) : gameFg.opacity(0.8))
             }
             .disabled(viewModel.diceCount <= 1)
 
             Text("\(viewModel.diceCount) \(lm.t(viewModel.diceCount > 1 ? "dice.dice" : "dice.die"))")
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
                 .frame(minWidth: 80)
 
             Button { viewModel.addDie() } label: {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 30))
-                    .foregroundStyle(viewModel.diceCount >= 6 ? .white.opacity(0.25) : .white.opacity(0.8))
+                    .foregroundStyle(viewModel.diceCount >= 6 ? gameFg.opacity(0.25) : gameFg.opacity(0.8))
             }
             .disabled(viewModel.diceCount >= 6)
         }
@@ -261,7 +264,7 @@ struct DiceRollView: View {
                     .foregroundStyle(Color(hex: "A1A1AA"))
                 Text("\(total)")
                     .font(.system(size: 52, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(gameFg)
             }
             .transition(.scale.combined(with: .opacity))
             .padding(.bottom, 8)

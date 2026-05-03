@@ -116,6 +116,8 @@ struct RouletteView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
+    @Environment(\.colorScheme) private var colorScheme
     @Query private var lists: [ChoiceList]
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
 
@@ -125,6 +127,8 @@ struct RouletteView: View {
 
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     private var isLandscape: Bool { verticalSizeClass == .compact }
+    private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
+    private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
     @State private var viewModel = RouletteViewModel()
     @State private var selectedList: ChoiceList? = nil
@@ -157,8 +161,7 @@ struct RouletteView: View {
 
     var body: some View {
         ZStack {
-            theme.backgroundGradient
-            .ignoresSafeArea()
+            GameBackgroundView(theme: theme, appearance: appearance, colorScheme: colorScheme)
 
             if isLandscape {
                 landscapeLayout
@@ -253,22 +256,22 @@ struct RouletteView: View {
             Button { dismiss() } label: {
                 ZStack {
                     Circle()
-                        .fill(.white.opacity(0.18))
+                        .fill(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.08) : Color.white.opacity(0.18))
                         .frame(width: 40, height: 40)
                     Image(systemName: "chevron.left")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                 }
             }
             Spacer()
             Text(lm.t("mode.roulette.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(gameFg)
             Spacer()
             Button { showCustomization = true } label: {
                 Image(systemName: "paintbrush.fill")
                     .font(.system(size: 20))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(gameFg.opacity(0.7))
             }
             .buttonStyle(.pressableLight)
         }
@@ -290,7 +293,7 @@ struct RouletteView: View {
                 } label: {
                     Text(lm.t(mode.labelKey))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(viewModel.inputMode == mode ? .white : .white.opacity(0.62))
+                        .foregroundStyle(viewModel.inputMode == mode ? .white : gameFg.opacity(0.62))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 9)
                         .background(
@@ -301,8 +304,8 @@ struct RouletteView: View {
                 }
             }
         }
-        .background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(.white.opacity(0.1), lineWidth: 1))
+        .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
         .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
     }
 
@@ -319,17 +322,17 @@ struct RouletteView: View {
                         .foregroundStyle(theme.primary)
                     Text(selectedList?.name ?? lm.t("draw.pickList"))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                         .lineLimit(1)
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(gameFg.opacity(0.3))
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
-                .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.09) : Color.white.opacity(0.09), lineWidth: 1))
             }
         case .directEntry:
             Button { showDirectEntryEditor = true } label: {
@@ -341,7 +344,7 @@ struct RouletteView: View {
                          ? lm.t("roulette.direct.enterItems")
                          : (viewModel.directEntries.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), viewModel.directEntries.count)))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(gameFg)
                     Spacer()
                     Text(lm.t("button.edit"))
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -349,8 +352,8 @@ struct RouletteView: View {
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
-                .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(.white.opacity(0.09), lineWidth: 1))
+                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.09) : Color.white.opacity(0.09), lineWidth: 1))
             }
         }
     }
@@ -543,23 +546,23 @@ struct RouletteView: View {
         VStack(spacing: 16) {
             Image(systemName: "circle.grid.cross")
                 .font(.system(size: 56))
-                .foregroundStyle(.white.opacity(0.35))
+                .foregroundStyle(gameFg.opacity(0.35))
             switch viewModel.inputMode {
             case .savedList:
                 Text(lists.isEmpty
                      ? lm.t("roulette.empty.noLists")
                      : lm.t("roulette.empty.listEmpty"))
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.5))
+                    .foregroundStyle(gameFg.opacity(0.5))
                     .multilineTextAlignment(.center)
             case .directEntry:
                 VStack(spacing: 8) {
                     Text(lm.t("roulette.empty.min2"))
                         .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(gameFg.opacity(0.5))
                     Text(lm.t("roulette.empty.addHint"))
                         .font(.system(size: 14, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.3))
+                        .foregroundStyle(gameFg.opacity(0.3))
                         .multilineTextAlignment(.center)
                 }
             }
