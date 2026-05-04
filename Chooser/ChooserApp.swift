@@ -3,29 +3,38 @@ import SwiftData
 
 @main
 struct ChooserApp: App {
-    var sharedModelContainer: ModelContainer = {
+    private let sharedModelContainer: ModelContainer
+    private let storageFallback: Bool
+
+    init() {
         let schema = Schema([ChoiceList.self])
-        let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let persistent = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
-            return try ModelContainer(for: schema, configurations: [config])
+            sharedModelContainer = try ModelContainer(for: schema, configurations: [persistent])
+            storageFallback = false
         } catch {
             #if DEBUG
-            try? FileManager.default.removeItem(at: config.url)
+            try? FileManager.default.removeItem(at: persistent.url)
             do {
-                return try ModelContainer(for: schema, configurations: [config])
+                sharedModelContainer = try ModelContainer(for: schema, configurations: [persistent])
+                storageFallback = false
             } catch let retryError {
                 fatalError("Could not create ModelContainer even after reset: \(retryError)")
             }
             #else
-            let fallback = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-            return (try? ModelContainer(for: schema, configurations: [fallback]))
-                ?? { fatalError("Could not create ModelContainer: \(error)") }()
+            let inMemory = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            guard let container = try? ModelContainer(for: schema, configurations: [inMemory]) else {
+                fatalError("Could not create in-memory ModelContainer")
+            }
+            sharedModelContainer = container
+            storageFallback = true
             #endif
         }
-    }()
+    }
 
-    @State private var languageManager  = LanguageManager()
+    @State private var languageManager   = LanguageManager()
     @State private var appearanceManager = AppearanceManager()
+    @State private var showStorageAlert  = false
 
     var body: some Scene {
         WindowGroup {
@@ -35,6 +44,16 @@ struct ChooserApp: App {
             .environment(languageManager)
             .environment(appearanceManager)
             .preferredColorScheme(appearanceManager.resolvedScheme)
+            .dynamicTypeSize(.xSmall ... .xxxLarge)
+            .transaction { t in
+                if appearanceManager.animationsReduced { t.animation = nil }
+            }
+            .alert(languageManager.t("storage.error.title"), isPresented: $showStorageAlert) {
+                Button(languageManager.t("button.ok"), role: .cancel) { }
+            } message: {
+                Text(languageManager.t("storage.error.message"))
+            }
+            .onAppear { showStorageAlert = storageFallback }
         }
         .modelContainer(sharedModelContainer)
     }
@@ -68,17 +87,12 @@ struct SplashScreenView<Content: View>: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 20) {
-                    ZStack {
-                        Circle()
-                            .fill(appearance.accent.opacity(0.16))
-                            .frame(width: 130, height: 130)
-                        Circle()
-                            .strokeBorder(appearance.accent.opacity(0.35), lineWidth: 1.5)
-                            .frame(width: 130, height: 130)
-                        Image(systemName: "circle.grid.cross.fill")
-                            .font(.system(size: 64, weight: .semibold))
-                            .foregroundStyle(appearance.accent)
-                    }
+                    Image("Logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 140, height: 140)
+                        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                        .shadow(color: appearance.accent.opacity(0.4), radius: 20, x: 0, y: 8)
 
                     Text("Chooser")
                         .font(.system(size: 42, weight: .black, design: .rounded))
