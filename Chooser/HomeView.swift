@@ -74,6 +74,16 @@ enum PickerMode: String, CaseIterable, Identifiable {
     }
 
     var accentColor: Color { gradient[0] }
+
+    /// Darker variants ensuring WCAG contrast on light (white) backgrounds.
+    var lightGradient: [Color] {
+        switch self {
+        case .ranking:          return [Color(hex: "D97706"), Color(hex: "059669")]
+        case .coinFlip:         return [Color(hex: "B45309"), Color(hex: "D97706")]
+        case .randomDraw:       return [Color(hex: "0891B2"), Color(hex: "0E7490")]
+        default:                return gradient
+        }
+    }
 }
 
 // MARK: - Home View
@@ -83,10 +93,46 @@ struct HomeView: View {
     @Environment(AppearanceManager.self) private var appearance
     @Environment(\.verticalSizeClass)    private var verticalSizeClass
     @Environment(\.colorScheme)          private var colorScheme
+    @Query private var lists: [ChoiceList]
+
+    @AppStorage("lastUsedMode")              private var lastUsedModeRaw = PickerMode.roulette.rawValue
+    @AppStorage("lastList_roulette")         private var lastListRoulette = ""
+    @AppStorage("lastList_randomDraw")       private var lastListRandomDraw = ""
+    @AppStorage("lastList_weightedRoulette") private var lastListWeightedRoulette = ""
+    @AppStorage("lastList_ranking")          private var lastListRanking = ""
 
     @State private var selectedMode: PickerMode? = nil
 
     private var isLandscape: Bool { verticalSizeClass == .compact }
+
+    private var heroMode: PickerMode {
+        PickerMode(rawValue: lastUsedModeRaw) ?? .roulette
+    }
+
+    private func lastListInfo(for mode: PickerMode) -> (emoji: String, name: String)? {
+        let name: String
+        switch mode {
+        case .roulette:         name = lastListRoulette
+        case .randomDraw:       name = lastListRandomDraw
+        case .weightedRoulette: name = lastListWeightedRoulette
+        case .ranking:          name = lastListRanking
+        default: return nil
+        }
+        guard !name.isEmpty, let list = lists.first(where: { $0.name == name }) else { return nil }
+        return (list.emoji, list.name)
+    }
+
+    private func preselectedList(for mode: PickerMode) -> ChoiceList? {
+        let name: String
+        switch mode {
+        case .roulette:         name = lastListRoulette
+        case .randomDraw:       name = lastListRandomDraw
+        case .weightedRoulette: name = lastListWeightedRoulette
+        case .ranking:          name = lastListRanking
+        default: return nil
+        }
+        return lists.first(where: { $0.name == name })
+    }
 
     private let twoColumns = [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)]
     private let threeColumns = [
@@ -106,12 +152,10 @@ struct HomeView: View {
                 .padding(14)
             } else {
                 VStack(spacing: 14) {
-                    // Featured hero card — full width
-                    modeButton(.fingerChooser, isFeatured: true)
+                    modeButton(heroMode, isFeatured: true)
 
-                    // 2-column grid for the rest
                     LazyVGrid(columns: twoColumns, spacing: 14) {
-                        ForEach(PickerMode.allCases.dropFirst()) { mode in
+                        ForEach(PickerMode.allCases.filter { $0 != heroMode }) { mode in
                             modeButton(mode, isFeatured: false)
                         }
                     }
@@ -172,13 +216,17 @@ struct HomeView: View {
     }
 
     private func modeButton(_ mode: PickerMode, isFeatured: Bool) -> some View {
-        Button { selectedMode = mode } label: {
+        Button {
+            lastUsedModeRaw = mode.rawValue
+            selectedMode = mode
+        } label: {
             PickerModeCard(
                 mode: mode,
                 title: lm.t(mode.titleKey),
                 subtitle: lm.t(mode.subtitleKey),
                 isFeatured: isFeatured,
-                visualStyle: appearance.visualStyle
+                visualStyle: appearance.visualStyle,
+                lastListInfo: lastListInfo(for: mode)
             )
         }
         .buttonStyle(.pressableCard)
@@ -188,9 +236,9 @@ struct HomeView: View {
     private func pickerDestination(_ mode: PickerMode) -> some View {
         switch mode {
         case .fingerChooser:    FingerChooserView()
-        case .roulette:         RouletteView()
+        case .roulette:         RouletteView(preselectedList: preselectedList(for: .roulette))
         case .dice:             DiceRollView()
-        case .randomDraw:       RandomDrawView()
+        case .randomDraw:       RandomDrawView(preselectedList: preselectedList(for: .randomDraw))
         case .coinFlip:         CoinFlipView()
         case .numberRoulette:   NumberRouletteContainerView()
         case .luckyArrow:       LuckyArrowView()
@@ -208,6 +256,7 @@ struct PickerModeCard: View {
     let subtitle: String
     let isFeatured: Bool
     let visualStyle: AppVisualStyle
+    var lastListInfo: (emoji: String, name: String)? = nil
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -248,6 +297,7 @@ struct PickerModeCard: View {
                     .lineLimit(2)
             }
             .padding(isFeatured ? 20 : 14)
+
         }
         .aspectRatio(isFeatured ? 2.2 : 1.15, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -305,7 +355,7 @@ struct PickerModeCard: View {
                     .font(.system(size: 32, weight: .semibold))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: isDark ? mode.gradient : [mode.gradient[0].opacity(0.75), mode.gradient[1].opacity(0.75)],
+                            colors: isDark ? mode.gradient : mode.lightGradient,
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -320,6 +370,7 @@ struct PickerModeCard: View {
                     .lineLimit(2)
             }
             .padding(20)
+
         }
         .aspectRatio(2.2, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -365,7 +416,7 @@ struct PickerModeCard: View {
                     .font(.system(size: 26, weight: .semibold))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: isDark ? mode.gradient : [mode.gradient[0].opacity(0.75), mode.gradient[1].opacity(0.75)],
+                            colors: isDark ? mode.gradient : mode.lightGradient,
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -380,6 +431,7 @@ struct PickerModeCard: View {
                     .lineLimit(2)
             }
             .padding(14)
+
         }
         .aspectRatio(1.15, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))

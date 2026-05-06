@@ -314,33 +314,35 @@ struct LuckyArrowView: View {
 
             // Outer ring
             Circle()
-                .stroke(.white.opacity(0.18), lineWidth: 1.5)
+                .stroke(gameFg.opacity(isAtmosLight ? 0.15 : 0.18), lineWidth: 1.5)
                 .frame(width: 302, height: 302)
 
             // Main soft disc
             Circle()
-                .fill(.white.opacity(0.16))
+                .fill(gameFg.opacity(isAtmosLight ? 0.06 : 0.16))
                 .frame(width: 286, height: 286)
 
             // Tick marks
             ForEach(0..<12, id: \.self) { i in
                 RoundedRectangle(cornerRadius: 1.5)
-                    .fill(.white.opacity(i % 3 == 0 ? 0.6 : 0.28))
+                    .fill(gameFg.opacity(i % 3 == 0 ? (isAtmosLight ? 0.45 : 0.6) : (isAtmosLight ? 0.18 : 0.28)))
                     .frame(width: 2, height: i % 3 == 0 ? 14 : 8)
                     .offset(y: -130)
                     .rotationEffect(.degrees(Double(i) * 30))
             }
 
-            // Arrow
+            // Arrow — uses theme primary so it's always visible
             ArrowShape()
                 .fill(
                     LinearGradient(
-                        colors: [.white, .white.opacity(0.88)],
+                        colors: isAtmosLight
+                            ? [theme.primary, theme.primary.opacity(0.82)]
+                            : [.white, .white.opacity(0.88)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                .shadow(color: .black.opacity(0.22), radius: 8, y: 4)
+                .shadow(color: (isAtmosLight ? theme.primary : Color.black).opacity(0.22), radius: 8, y: 4)
                 .frame(width: 220, height: 220)
                 .rotationEffect(.degrees(viewModel.rotation))
                 .animation(viewModel.isSpinning ? .timingCurve(0.15, 0.85, 0.25, 1.0, duration: 5.0) : .none, value: viewModel.rotation)
@@ -349,7 +351,7 @@ struct LuckyArrowView: View {
             Circle()
                 .fill(
                     RadialGradient(
-                        colors: [.white.opacity(0.95), theme.primary],
+                        colors: [gameFg.opacity(0.95), theme.primary],
                         center: UnitPoint(x: 0.35, y: 0.3),
                         startRadius: 0,
                         endRadius: 12
@@ -460,22 +462,22 @@ struct LuckyArrowView: View {
         } label: {
             HStack(spacing: 10) {
                 if viewModel.isSpinning {
-                    ProgressView().tint(theme.primary).scaleEffect(0.85)
+                    ProgressView().tint(isAtmosLight ? theme.primary.contrastingText : theme.primary).scaleEffect(0.85)
                 } else {
                     Image(systemName: "arrow.clockwise.circle.fill")
                         .font(.system(size: 20))
-                        .foregroundStyle(theme.primary)
+                        .foregroundStyle(isAtmosLight ? theme.primary.contrastingText : theme.primary)
                 }
                 Text(viewModel.isSpinning
                      ? lm.t("arrow.spinning")
                      : (subMode == .bottle ? lm.t("bottle.spin.button") : lm.t("button.start")))
                     .font(.system(size: 22, weight: .black, design: .rounded))
-                    .foregroundStyle(theme.primary)
+                    .foregroundStyle(isAtmosLight ? theme.primary.contrastingText : theme.primary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
-            .background(.white, in: Capsule())
-            .shadow(color: .black.opacity(0.20), radius: 12, y: 6)
+            .background(isAtmosLight ? theme.primary : .white, in: Capsule())
+            .shadow(color: (isAtmosLight ? theme.primary : Color.black).opacity(0.20), radius: 12, y: 6)
         }
         .disabled(viewModel.isSpinning)
         .buttonStyle(.pressable)

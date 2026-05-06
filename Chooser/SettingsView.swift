@@ -10,6 +10,13 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
+            // ── Apparence ─────────────────────────────────────────────────
+            Section {
+                NavigationLink(destination: PersonalizationView()) {
+                    Label(lm.t("personalization.title"), systemImage: "paintpalette.fill")
+                }
+            }
+
             // ── Langue ────────────────────────────────────────────────────
             Section {
                 ForEach(AppLanguage.allCases) { lang in

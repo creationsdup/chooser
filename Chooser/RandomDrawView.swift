@@ -79,13 +79,21 @@ struct RandomDrawView: View {
     private var isLandscape: Bool { verticalSizeClass == .compact }
     private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
     private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
+    private var adaptiveYellow: Color { isAtmosLight ? Color(hex: "B45309") : Color(hex: "FFE66D") }
+
+    init(preselectedList: ChoiceList? = nil) {
+        _selectedList = State(initialValue: preselectedList)
+    }
 
     @State private var viewModel = RandomDrawViewModel()
-    @State private var selectedList: ChoiceList? = nil
-    @State private var showListPicker = false
+    @AppStorage("lastList_randomDraw") private var lastListStorage = ""
+
+    @State private var selectedList: ChoiceList?
+    @State private var showSourceSelector = false
     @State private var showSaveSheet = false
     @State private var saveListName = ""
     @State private var newEntryText = ""
+    @State private var showResultConfetti = false
     // Reel context — items visible above/below the selection window
     @State private var reelAbove: [String] = ["·", "·"]
     @State private var reelBelow: [String] = ["·", "·"]
@@ -109,7 +117,22 @@ struct RandomDrawView: View {
             } else {
                 portraitLayout
             }
+
+            if let result = viewModel.result {
+                RouletteResultView(result: result, winnerColor: theme.primary) {
+                    viewModel.reset()
+                }
+                .transition(.opacity)
+                .zIndex(10)
+            }
+
+            if showResultConfetti {
+                ConfettiBurstView(color: theme.primary)
+                    .allowsHitTesting(false)
+                    .zIndex(11)
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: viewModel.result != nil)
         .onAppear {
             if selectedList == nil { selectedList = lists.first }
             refreshIdleReel()
@@ -125,11 +148,21 @@ struct RandomDrawView: View {
                 reelBelow = (0..<2).map { _ in validItems.randomElement() ?? "·" }
             }
         }
-        // Restore idle reel after reset
+        // Restore idle reel after reset; fire confetti on result
         .onChange(of: viewModel.result) { _, res in
-            if res == nil { refreshIdleReel() }
+            if res == nil {
+                refreshIdleReel()
+                showResultConfetti = false
+            } else {
+                showResultConfetti = true
+                Task {
+                    try? await Task.sleep(for: .milliseconds(1400))
+                    showResultConfetti = false
+                }
+            }
         }
         .onChange(of: selectedList?.id) { _, _ in refreshIdleReel() }
+        .onChange(of: selectedList) { _, list in if let list { lastListStorage = list.name } }
         // Auto-focus keyboard when switching to direct entry mode
         .onChange(of: viewModel.inputMode) { _, mode in
             if mode == .directEntry {
@@ -141,7 +174,7 @@ struct RandomDrawView: View {
                 entryFieldFocused = false
             }
         }
-        .sheet(isPresented: $showListPicker) { listPickerSheet }
+        .sheet(isPresented: $showSourceSelector) { sourceSelectorSheet }
         .sheet(isPresented: $showSaveSheet) { saveSheet }
     }
 
@@ -178,8 +211,8 @@ struct RandomDrawView: View {
 
             // Controls
             VStack(spacing: 10) {
-                inputModeSelector
-                sourcePanel
+                sourcePill
+                if viewModel.inputMode == .directEntry { directEntryPanel }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 12)
@@ -235,7 +268,7 @@ struct RandomDrawView: View {
                     } else {
                         Text(centerText)
                             .font(.system(size: 26, weight: .black, design: .rounded))
-                            .foregroundStyle(isResult ? Color(hex: "FFE66D") : gameFg)
+                            .foregroundStyle(isResult ? adaptiveYellow : gameFg)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
                             .padding(.horizontal, 24)
@@ -293,8 +326,8 @@ struct RandomDrawView: View {
                         Spacer()
                         Image(systemName: "checkmark.seal.fill")
                             .font(.system(size: 26))
-                            .foregroundStyle(Color(hex: "FFE66D"))
-                            .shadow(color: Color(hex: "FFE66D").opacity(0.7), radius: 10)
+                            .foregroundStyle(adaptiveYellow)
+                            .shadow(color: adaptiveYellow.opacity(0.7), radius: 10)
                             .padding(12)
                     }
                     Spacer()
@@ -361,10 +394,10 @@ struct RandomDrawView: View {
                 }
                 .frame(maxWidth: .infinity)
 
-                // Right: mode selector + source panel
+                // Right: source pill + optional entry panel
                 VStack(spacing: 10) {
-                    inputModeSelector
-                    sourcePanel
+                    sourcePill
+                    if viewModel.inputMode == .directEntry { directEntryPanel }
                     Spacer()
                 }
                 .padding(.horizontal, 16)
@@ -415,65 +448,143 @@ struct RandomDrawView: View {
         }
     }
 
-    // MARK: - Input Mode Selector
+    // MARK: - Source Pill
 
-    private var inputModeSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(ItemInputMode.allCases) { mode in
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
-                        viewModel.inputMode = mode
-                        viewModel.reset()
+    private var sourcePill: some View {
+        Button { showSourceSelector = true } label: {
+            HStack(spacing: 10) {
+                switch viewModel.inputMode {
+                case .savedList:
+                    if let emoji = selectedList?.emoji, !emoji.isEmpty {
+                        Text(emoji).font(.system(size: 16))
+                    } else {
+                        Image(systemName: "list.bullet.clipboard")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(theme.primary)
                     }
-                } label: {
-                    Text(lm.t(mode.labelKey))
+                    Text(selectedList?.name ?? lm.t("draw.pickList"))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(viewModel.inputMode == mode ? .white : gameFg.opacity(0.45))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            viewModel.inputMode == mode
-                                ? theme.primary.opacity(0.28)
-                                : Color.clear
-                        )
+                        .foregroundStyle(gameFg)
+                        .lineLimit(1)
+                case .directEntry:
+                    Image(systemName: "pencil")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(theme.primary)
+                    Text(viewModel.directEntries.isEmpty
+                         ? lm.t("roulette.direct.enterItems")
+                         : (viewModel.directEntries.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), viewModel.directEntries.count)))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .foregroundStyle(gameFg)
+                        .lineLimit(1)
+                }
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(gameFg.opacity(0.35))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.10), lineWidth: 1))
+        }
+    }
+
+    // MARK: - Source Selector Sheet
+
+    private var sourceSelectorSheet: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(ItemInputMode.allCases) { mode in
+                        Button {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                viewModel.inputMode = mode
+                                viewModel.reset()
+                            }
+                            if mode == .directEntry {
+                                showSourceSelector = false
+                                Task {
+                                    try? await Task.sleep(nanoseconds: 300_000_000)
+                                    entryFieldFocused = true
+                                }
+                            } else {
+                                showSourceSelector = false
+                            }
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: mode == .savedList ? "list.bullet.clipboard" : "pencil")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(theme.primary)
+                                    .frame(width: 24)
+                                Text(lm.t(mode.labelKey))
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if viewModel.inputMode == mode {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(theme.primary)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                if viewModel.inputMode == .savedList {
+                    Section(lm.t("draw.pickList")) {
+                        ForEach(lists) { list in
+                            Button {
+                                selectedList = list
+                                viewModel.reset()
+                                showSourceSelector = false
+                            } label: {
+                                HStack(spacing: 12) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                            .fill(theme.primary.opacity(0.12))
+                                            .frame(width: 36, height: 36)
+                                        if list.emoji.isEmpty {
+                                            Image(systemName: "list.bullet")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundStyle(theme.primary)
+                                        } else {
+                                            Text(list.emoji).font(.system(size: 20))
+                                        }
+                                    }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(list.name)
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundStyle(.primary)
+                                        Text(list.items.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), list.items.count))
+                                            .font(.system(size: 13, design: .rounded))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    if list === selectedList {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(theme.primary)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .navigationTitle(lm.t("source.selector.title"))
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(lm.t("button.close")) { showSourceSelector = false }
                 }
             }
         }
-        .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    // MARK: - Source Panel
-
-    @ViewBuilder
-    private var sourcePanel: some View {
-        switch viewModel.inputMode {
-        case .savedList:  savedListPanel
-        case .directEntry: directEntryPanel
-        }
-    }
-
-    private var savedListPanel: some View {
-        Button { showListPicker = true } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "list.bullet")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(theme.primary)
-                Text(selectedList?.name ?? lm.t("draw.pickList"))
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .lineLimit(1)
-                    .foregroundStyle(gameFg)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(gameFg.opacity(0.35))
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
-            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.09), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
-        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     @ViewBuilder
@@ -670,14 +781,14 @@ struct RandomDrawView: View {
         } label: {
             HStack(spacing: 10) {
                 if viewModel.isAnimating {
-                    ProgressView().tint(.white).scaleEffect(0.85)
+                    ProgressView().tint(theme.primary.contrastingText).scaleEffect(0.85)
                 } else {
                     Image(systemName: viewModel.result != nil ? "arrow.clockwise" : "shuffle")
                         .font(.system(size: 18, weight: .semibold))
                 }
                 Text(viewModel.isAnimating ? lm.t("draw.drawing") : (viewModel.result != nil ? lm.t("button.again") : lm.t("draw.button")))
                     .font(.system(size: 20, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(theme.primary.contrastingText)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
@@ -722,44 +833,6 @@ struct RandomDrawView: View {
     }
 
     // MARK: - Sheets
-
-    private var listPickerSheet: some View {
-        NavigationStack {
-            List(lists) { list in
-                Button {
-                    selectedList = list
-                    viewModel.reset()
-                    showListPicker = false
-                } label: {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(list.name)
-                                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.primary)
-                            Text(list.items.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), list.items.count))
-                                .font(.system(size: 13, design: .rounded))
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        if list === selectedList {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(theme.primary)
-                        }
-                    }
-                }
-            }
-            .navigationTitle(lm.t("draw.pickList"))
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(lm.t("button.close")) { showListPicker = false }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
-    }
 
     private var saveSheet: some View {
         NavigationStack {

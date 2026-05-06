@@ -284,7 +284,7 @@ struct DiceRollView: View {
                 systemImage: viewModel.isRolling ? "hourglass" : "die.face.5.fill"
             )
             .font(.system(size: 20, weight: .black, design: .rounded))
-            .foregroundStyle(.white)
+            .foregroundStyle(theme.primary.contrastingText)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 18)
             .background(theme.primary, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -405,12 +405,12 @@ struct PolygonDieView: View {
             // Die type label — always visible as an identifier
             Text("D\(sides)")
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.45))
+                .foregroundStyle(color.contrastingText.opacity(0.45))
                 .offset(y: -15)
 
             Text("\(value)")
                 .font(.system(size: 34, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(color.contrastingText)
                 .opacity(resultVisible ? 1 : 0)
                 .animation(.easeIn(duration: 0.2), value: resultVisible)
         }

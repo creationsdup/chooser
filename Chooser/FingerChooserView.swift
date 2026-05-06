@@ -484,7 +484,7 @@ struct ModeIllustrationView: View {
                 .shadow(color: Color(hex: "FFE66D").opacity(0.7), radius: 10)
             Image(systemName: "crown.fill")
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color(hex: "FFE66D").contrastingText)
         }
         .frame(width: 80, height: 80)
     }
@@ -506,7 +506,7 @@ struct ModeIllustrationView: View {
                 .shadow(color: color.opacity(0.6), radius: 6)
             Text("\(rank)")
                 .font(.system(size: size * 0.42, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(color.contrastingText)
         }
     }
 
@@ -699,7 +699,7 @@ struct TouchCircleView: View {
                     }
                     Text("\(rank)")
                         .font(.system(size: rank == 1 ? 28 : 24, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(circleColor.contrastingText)
                 }
                 .transition(.scale(scale: 0.2).combined(with: .opacity))
             }
@@ -708,7 +708,7 @@ struct TouchCircleView: View {
             if point.isSolo {
                 Image(systemName: "questionmark")
                     .font(.system(size: 26, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(circleColor.contrastingText)
             }
 
             // Pulsing halo (classic winner)
@@ -1120,7 +1120,7 @@ struct FingerChooserView: View {
             Image(systemName: "arrow.counterclockwise.circle.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(gameFg.opacity(0.85))
-                .shadow(color: Color(hex: "A855F7").opacity(0.8), radius: 20)
+                .shadow(color: theme.primary.opacity(0.8), radius: 20)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.85)))
     }

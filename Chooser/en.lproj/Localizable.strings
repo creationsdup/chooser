@@ -8,7 +8,7 @@
 "splash.tagline" = "Luck is in your hands";
 
 /* ── Home ── */
-"home.title" = "Chooser 🎲";
+"home.title" = "Choozr";
 
 /* ── Picker modes ── */
 "mode.fingerChooser.title"    = "Finger Chooser";
@@ -31,7 +31,7 @@
 /* ── My Lists ── */
 "lists.title"             = "My Lists";
 "lists.empty.title"       = "No lists yet";
-"lists.empty.body"        = "Create your first list to use\nit in Roulette or Random Draw!";
+"lists.empty.body"        = "Create your first list and use it across all picker modes.";
 "lists.create"            = "Create a list";
 "lists.new.title"         = "New list";
 "lists.new.nameSection"   = "List name";
@@ -41,8 +41,8 @@
 
 /* ── List detail ── */
 "detail.addPlaceholder"   = "Add an item…";
-"detail.emptyTitle"       = "Empty list";
-"detail.emptyBody"        = "Tap + to add items";
+"detail.emptyTitle"       = "Nothing here yet";
+"detail.emptyBody"        = "Add your first item with the field below";
 
 /* ── Settings ── */
 "settings.title"          = "Settings";
@@ -54,8 +54,8 @@
 "settings.stats"          = "Statistics";
 "settings.stats.lists"    = "Lists created";
 "settings.stats.items"    = "Total items";
-"settings.danger"         = "Danger zone";
-"settings.reset"          = "Clear all data";
+"settings.danger"         = "Data Management";
+"settings.reset"          = "Reset all data";
 "settings.reset.footer"   = "Deletes all your lists and items. This action is irreversible.";
 "settings.reset.confirm"  = "Clear all data?";
 "settings.reset.action"   = "Clear all";

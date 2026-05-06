@@ -189,10 +189,13 @@ struct WeightedRouletteView: View {
     private var isLandscape: Bool { verticalSizeClass == .compact }
     private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
     private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
+    private var adaptiveYellow: Color { isAtmosLight ? Color(hex: "B45309") : Color(hex: "FFE66D") }
+    private var adaptiveTeal: Color { isAtmosLight ? Color(hex: "0E7490") : Color(hex: "4ECDC4") }
 
     private enum Phase { case setup, customize, wheel }
 
     @State private var viewModel = WeightedRouletteViewModel()
+    @State private var showResultConfetti = false
     @State private var showOptions = false
     @State private var showSaveSheet = false
     @State private var showLoadSheet = false
@@ -221,6 +224,34 @@ struct WeightedRouletteView: View {
                     landscapeLayout
                 } else {
                     portraitLayout
+                }
+                if let result = viewModel.result {
+                    RouletteResultView(
+                        result: result.name,
+                        winnerColor: viewModel.winnerColor,
+                        subtitle: String(format: lm.t("weighted.probability"), viewModel.percentage(for: result))
+                    ) {
+                        viewModel.reset()
+                    }
+                    .transition(.opacity)
+                    .zIndex(10)
+                }
+                if showResultConfetti {
+                    ConfettiBurstView(color: viewModel.winnerColor)
+                        .allowsHitTesting(false)
+                        .zIndex(11)
+                }
+            }
+            .animation(.easeInOut(duration: 0.25), value: viewModel.result != nil)
+            .onChange(of: viewModel.result?.id) { _, res in
+                if res == nil {
+                    showResultConfetti = false
+                } else {
+                    showResultConfetti = true
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(2000))
+                        showResultConfetti = false
+                    }
                 }
             }
             .sheet(isPresented: $showOptions) {
@@ -379,7 +410,7 @@ struct WeightedRouletteView: View {
                 } label: {
                     Text(lm.t("weighted.setup.continue"))
                         .font(.system(size: 20, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(theme.primary.contrastingText)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 18)
                         .background(theme.primary, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -419,7 +450,7 @@ struct WeightedRouletteView: View {
         return Button { selectedCount = n } label: {
             Text("\(n)")
                 .font(.system(size: 30, weight: .black, design: .rounded))
-                .foregroundStyle(isSelected ? .white : gameFg.opacity(0.45))
+                .foregroundStyle(isSelected ? theme.primary.contrastingText : gameFg.opacity(0.45))
                 .frame(width: 72, height: 72)
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -489,7 +520,7 @@ struct WeightedRouletteView: View {
                         Text(lm.t("weighted.customize.namesRequired"))
                             .font(.system(size: 13, design: .rounded))
                     }
-                    .foregroundStyle(Color(hex: "FFE66D"))
+                    .foregroundStyle(adaptiveYellow)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 6)
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -505,7 +536,7 @@ struct WeightedRouletteView: View {
                             .font(.system(size: 20))
                         Text(lm.t("weighted.customize.start"))
                             .font(.system(size: 20, weight: .black, design: .rounded))
-                            .foregroundStyle(canStart ? .white : gameFg.opacity(0.4))
+                            .foregroundStyle(canStart ? theme.primary.contrastingText : gameFg.opacity(0.4))
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 18)
@@ -548,7 +579,7 @@ struct WeightedRouletteView: View {
                     .contentTransition(.numericText())
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: total)
             }
-            .foregroundStyle(isExact ? Color(hex: "4ECDC4") : Color(hex: "FFE66D"))
+            .foregroundStyle(isExact ? adaptiveTeal : adaptiveYellow)
             .frame(maxWidth: .infinity, alignment: .trailing)
             .padding(.top, 4)
         }
@@ -647,13 +678,7 @@ struct WeightedRouletteView: View {
             .frame(height: wheelSize)
             .offset(y: -20)
 
-            // Result overlay
-            if let result = viewModel.result {
-                weightedResultCard(for: result)
-                    .transition(.scale(scale: 0.65).combined(with: .opacity))
-            }
         }
-        .animation(.spring(response: 0.45, dampingFraction: 0.72), value: viewModel.result != nil)
     }
 
     private var emptyWheel: some View {
@@ -724,7 +749,7 @@ struct WeightedRouletteView: View {
                         .foregroundStyle(gameFg.opacity(0.35))
                     Text(String(format: "%.0f%%", total))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(isExact ? Color(hex: "4ECDC4") : Color(hex: "FFE66D"))
+                        .foregroundStyle(isExact ? adaptiveTeal : adaptiveYellow)
                         .contentTransition(.numericText())
                         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: total)
                 }
@@ -786,61 +811,12 @@ struct WeightedRouletteView: View {
                     Text(lm.t("weighted.disclaimer"))
                         .font(.system(size: 11, design: .rounded))
                 }
-                .foregroundStyle(Color(hex: "FFE66D").opacity(0.7))
+                .foregroundStyle(adaptiveYellow.opacity(0.7))
                 .padding(.top, 12)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
                 .animation(.spring(response: 0.35, dampingFraction: 0.75), value: abs(viewModel.totalPercent - 100) > 0.5)
             }
         }
-    }
-
-    // MARK: Result Card
-
-    private func weightedResultCard(for result: WeightedOption) -> some View {
-        VStack(spacing: 14) {
-            Text("🎉")
-                .font(.system(size: 44))
-            Text(result.name)
-                .font(.system(size: 26, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 12)
-                .shadow(color: .black.opacity(0.4), radius: 4)
-
-            let pct = viewModel.percentage(for: result)
-            Text(String(format: lm.t("weighted.probability"), pct))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.55))
-
-            Button { viewModel.reset() } label: {
-                Text(lm.t("button.again"))
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(viewModel.winnerColor.contrastingText)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 10)
-                    .background(viewModel.winnerColor, in: Capsule())
-                    .shadow(color: viewModel.winnerColor.opacity(0.45), radius: 6, y: 3)
-            }
-            .padding(.top, 2)
-        }
-        .padding(.vertical, 26)
-        .padding(.horizontal, 30)
-        .background(
-            ZStack {
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(Color.black.opacity(0.78))
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(LinearGradient(
-                        colors: [viewModel.winnerColor.opacity(0.35), viewModel.winnerColor.opacity(0.15)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    ))
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .stroke(viewModel.winnerColor.opacity(0.55), lineWidth: 1.5)
-            }
-        )
-        .innerHighlight(cornerRadius: 26, intensity: 0.12)
-        .shadow(color: viewModel.winnerColor.opacity(0.45), radius: 24, y: 10)
-        .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
     }
 
     // MARK: Spin Button
@@ -1116,17 +1092,6 @@ struct WeightedWheelCanvas: View {
                 path.closeSubpath()
                 context.fill(path, with: .color(segColor))
 
-                // --- Leading-edge highlight (top 18% of arc) ---
-                var highlight = Path()
-                highlight.move(to: center)
-                highlight.addArc(center: center, radius: radius,
-                                 startAngle: .radians(startRad),
-                                 endAngle: .radians(startRad + segRad * 0.18),
-                                 clockwise: false)
-
-                highlight.closeSubpath()
-                context.fill(highlight, with: .color(.white.opacity(0.10)))
-
                 // --- Divider line at segment start ---
                 var line = Path()
                 line.move(to: center)
@@ -1308,6 +1273,7 @@ struct SaveWheelSheet: View {
     @Environment(\.colorScheme) private var colorScheme
     private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
     private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
+    private var adaptiveTeal: Color { isAtmosLight ? Color(hex: "0E7490") : Color(hex: "4ECDC4") }
 
     @State private var wheelName: String = ""
     @State private var savedWheels: [SavedWheel] = []
@@ -1366,7 +1332,7 @@ struct SaveWheelSheet: View {
                                 Text(lm.t("wheel.save.saved"))
                             }
                             .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(Color(hex: "4ECDC4"))
+                            .foregroundStyle(adaptiveTeal)
                             .transition(.opacity.combined(with: .scale(scale: 0.9)))
                         }
 

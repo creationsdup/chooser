@@ -8,7 +8,7 @@
 "splash.tagline" = "Le hasard, c'est toi qui décides";
 
 /* ── Home ── */
-"home.title" = "Chooser 🎲";
+"home.title" = "Choozr";
 
 /* ── Picker modes ── */
 "mode.fingerChooser.title"    = "Finger Chooser";
@@ -31,7 +31,7 @@
 /* ── My Lists ── */
 "lists.title"             = "Mes Listes";
 "lists.empty.title"       = "Aucune liste";
-"lists.empty.body"        = "Crée ta première liste pour\nl'utiliser dans la Roulette\nou le Tirage au Sort !";
+"lists.empty.body"        = "Crée ta première liste et utilise-la dans tous les modes de tirage.";
 "lists.create"            = "Créer une liste";
 "lists.new.title"         = "Nouvelle liste";
 "lists.new.nameSection"   = "Nom de la liste";
@@ -41,8 +41,8 @@
 
 /* ── List detail ── */
 "detail.addPlaceholder"   = "Ajouter un élément…";
-"detail.emptyTitle"       = "Liste vide";
-"detail.emptyBody"        = "Appuie sur + pour ajouter des éléments";
+"detail.emptyTitle"       = "Rien ici pour l'instant";
+"detail.emptyBody"        = "Ajoute ton premier élément avec le champ ci-dessous";
 
 /* ── Settings ── */
 "settings.title"          = "Réglages";
@@ -54,8 +54,8 @@
 "settings.stats"          = "Statistiques";
 "settings.stats.lists"    = "Listes créées";
 "settings.stats.items"    = "Éléments au total";
-"settings.danger"         = "Zone de danger";
-"settings.reset"          = "Effacer toutes les données";
+"settings.danger"         = "Gestion des données";
+"settings.reset"          = "Réinitialiser les données";
 "settings.reset.footer"   = "Supprime toutes les listes et leurs éléments. Cette action est irréversible.";
 "settings.reset.confirm"  = "Effacer toutes les données ?";
 "settings.reset.action"   = "Tout effacer";

@@ -4,10 +4,13 @@ import SwiftData
 struct ListDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(LanguageManager.self) private var lm
+    @Environment(AppearanceManager.self) private var appearance
     let list: ChoiceList
 
     @State private var newItemText = ""
     @FocusState private var fieldFocused: Bool
+    @State private var showLaunchSheet = false
+    @State private var launchMode: PickerMode? = nil
 
     var body: some View {
         Group {
@@ -19,12 +22,30 @@ struct ListDetailView: View {
                     .toolbar { toolbarContent }
             }
         }
-        .navigationTitle(list.name)
+        .navigationTitle(list.emoji.isEmpty ? list.name : "\(list.emoji) \(list.name)")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.large)
         #endif
         .safeAreaInset(edge: .bottom) {
             addItemBar
+        }
+        .confirmationDialog(lm.t("lists.use"), isPresented: $showLaunchSheet, titleVisibility: .visible) {
+            Button(lm.t("mode.roulette.title")) { launchMode = .roulette }
+            Button(lm.t("mode.randomDraw.title")) { launchMode = .randomDraw }
+            Button(lm.t("button.cancel"), role: .cancel) {}
+        }
+        .fullScreenCover(item: $launchMode) { mode in
+            Group {
+                if mode == .roulette {
+                    RouletteView(preselectedList: list)
+                } else {
+                    RandomDrawView(preselectedList: list)
+                }
+            }
+            .environment(lm)
+            .environment(appearance)
+            .environment(\.appTheme, appearance.resolvedTheme)
+            .preferredColorScheme(appearance.resolvedScheme)
         }
     }
 
@@ -33,10 +54,10 @@ struct ListDetailView: View {
     private var itemList: some View {
         List {
             ForEach(Array(list.items.enumerated()), id: \.0) { index, item in
-                HStack {
-                    Image(systemName: "circle.fill")
-                        .font(.system(size: 7))
-                        .foregroundStyle(.secondary)
+                HStack(spacing: 10) {
+                    Circle()
+                        .fill(Color.accentColor.opacity(0.55))
+                        .frame(width: 8, height: 8)
                     Text(item)
                         .font(.system(size: 17, design: .rounded))
                 }
@@ -89,7 +110,7 @@ struct ListDetailView: View {
             Button(action: addItem) {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 36))
-                    .foregroundStyle(newItemText.trimmingCharacters(in: .whitespaces).isEmpty ? .secondary : Color(hex: "4ECDC4"))
+                    .foregroundStyle(newItemText.trimmingCharacters(in: .whitespaces).isEmpty ? .secondary : Color.accentColor)
             }
             .disabled(newItemText.trimmingCharacters(in: .whitespaces).isEmpty)
         }
@@ -103,12 +124,17 @@ struct ListDetailView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         #if os(iOS)
-        ToolbarItem(placement: .primaryAction) {
+        ToolbarItem(placement: .topBarTrailing) {
             EditButton()
         }
-        #else
-        ToolbarItem(placement: .primaryAction) {
-            EmptyView()
+        ToolbarItem(placement: .topBarTrailing) {
+            Button {
+                showLaunchSheet = true
+            } label: {
+                Image(systemName: "play.circle.fill")
+                    .font(.system(size: 20))
+            }
+            .disabled(list.items.isEmpty)
         }
         #endif
     }
@@ -118,8 +144,11 @@ struct ListDetailView: View {
     private func addItem() {
         let trimmed = newItemText.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
-        list.items.append(trimmed)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+            list.items.append(trimmed)
+        }
         newItemText = ""
+        hapticImpact(.light)
     }
 
     private func deleteItems(_ offsets: IndexSet) {

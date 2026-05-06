@@ -132,13 +132,19 @@ struct RouletteView: View {
     private var isAtmosLight: Bool { appearance.visualStyle == .atmos && colorScheme == .light }
     private var gameFg: Color { isAtmosLight ? Color(hex: "1A1A2E") : .white }
 
+    init(preselectedList: ChoiceList? = nil) {
+        _selectedList = State(initialValue: preselectedList)
+    }
+
+    @AppStorage("lastList_roulette") private var lastListStorage = ""
+
     @State private var viewModel = RouletteViewModel()
-    @State private var selectedList: ChoiceList? = nil
-    @State private var showListPicker = false
+    @State private var selectedList: ChoiceList?
+    @State private var showResultConfetti = false
+    @State private var showSourceSelector = false
     @State private var showDirectEntryEditor = false
     @State private var showCustomization = false
     @State private var newEntryText = ""
-    @State private var expandedListIDs: Set<PersistentIdentifier> = []
 
     private var frameStyle: WheelFrameStyle {
         WheelFrameStyle(rawValue: wheelFrameStyleRaw) ?? .simple
@@ -150,7 +156,7 @@ struct RouletteView: View {
         PointerStyle(rawValue: pointerStyleRaw) ?? .pin
     }
 
-    private var wheelSize: CGFloat { 300 }
+    private var wheelSize: CGFloat { min(UIScreen.main.bounds.width - 40, 380) }
 
     private var segments: [String] {
         switch viewModel.inputMode {
@@ -170,11 +176,38 @@ struct RouletteView: View {
             } else {
                 portraitLayout
             }
+
+            if let result = viewModel.result {
+                RouletteResultView(result: result, winnerColor: viewModel.winnerColor) {
+                    viewModel.reset()
+                }
+                .transition(.opacity)
+                .zIndex(10)
+            }
+
+            if showResultConfetti {
+                ConfettiBurstView(color: viewModel.winnerColor)
+                    .allowsHitTesting(false)
+                    .zIndex(11)
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: viewModel.result != nil)
         .onAppear { if selectedList == nil { selectedList = lists.first } }
         .onChange(of: lists.count) { _, _ in if selectedList == nil { selectedList = lists.first } }
+        .onChange(of: selectedList) { _, list in if let list { lastListStorage = list.name } }
+        .onChange(of: viewModel.result) { _, res in
+            if res == nil {
+                showResultConfetti = false
+            } else {
+                showResultConfetti = true
+                Task {
+                    try? await Task.sleep(for: .milliseconds(2000))
+                    showResultConfetti = false
+                }
+            }
+        }
         .onDisappear { viewModel.cancelSpin() }
-        .sheet(isPresented: $showListPicker) { listPickerSheet }
+        .sheet(isPresented: $showSourceSelector) { sourceSelectorSheet }
         .sheet(isPresented: $showDirectEntryEditor) { directEntryEditorSheet }
         .sheet(isPresented: $showCustomization) {
             RouletteCustomizationView()
@@ -187,12 +220,9 @@ struct RouletteView: View {
     private var portraitLayout: some View {
         VStack(spacing: 0) {
             topBar
-            inputModeSelector
+            sourcePill
                 .padding(.horizontal, 20)
-                .padding(.bottom, 10)
-            sourceRow
-                .padding(.horizontal, 20)
-                .padding(.bottom, 4)
+                .padding(.bottom, 12)
 
             Spacer()
 
@@ -207,7 +237,6 @@ struct RouletteView: View {
 
             if segments.count >= 2 {
                 spinButton
-                    .padding(.horizontal, 30)
                     .padding(.bottom, 44)
             }
         }
@@ -236,8 +265,7 @@ struct RouletteView: View {
 
                     // Right column: controls
                     VStack(spacing: 10) {
-                        inputModeSelector
-                        sourceRow
+                        sourcePill
                         Spacer()
                         if segments.count >= 2 {
                             spinButton
@@ -283,82 +311,162 @@ struct RouletteView: View {
         .padding(.bottom, 10)
     }
 
-    // MARK: - Input Mode Selector
+    // MARK: - Source Pill
 
-    private var inputModeSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(ItemInputMode.allCases) { mode in
-                Button {
-                    withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
-                        viewModel.inputMode = mode
-                        viewModel.reset()
+    private var sourcePill: some View {
+        Button { showSourceSelector = true } label: {
+            HStack(spacing: 10) {
+                switch viewModel.inputMode {
+                case .savedList:
+                    if let emoji = selectedList?.emoji, !emoji.isEmpty {
+                        Text(emoji).font(.system(size: 16))
+                    } else {
+                        Image(systemName: "list.bullet.clipboard")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(theme.primary)
                     }
-                } label: {
-                    Text(lm.t(mode.labelKey))
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundStyle(viewModel.inputMode == mode ? .white : gameFg.opacity(0.62))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 9)
-                        .background(
-                            viewModel.inputMode == mode
-                                ? theme.primary.opacity(0.28)
-                                : Color.clear
-                        )
-                }
-            }
-        }
-        .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.10) : Color.white.opacity(0.1), lineWidth: 1))
-        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-    }
-
-    // MARK: - Source Row
-
-    @ViewBuilder
-    private var sourceRow: some View {
-        switch viewModel.inputMode {
-        case .savedList:
-            Button { showListPicker = true } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "list.bullet")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(theme.primary)
                     Text(selectedList?.name ?? lm.t("draw.pickList"))
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(gameFg)
                         .lineLimit(1)
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(gameFg.opacity(0.3))
-                }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.09) : Color.white.opacity(0.09), lineWidth: 1))
-            }
-        case .directEntry:
-            Button { showDirectEntryEditor = true } label: {
-                HStack(spacing: 8) {
+                case .directEntry:
                     Image(systemName: "pencil")
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(theme.primary)
                     Text(viewModel.directEntries.isEmpty
                          ? lm.t("roulette.direct.enterItems")
                          : (viewModel.directEntries.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), viewModel.directEntries.count)))
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(gameFg)
-                    Spacer()
-                    Text(lm.t("button.edit"))
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(theme.primary)
+                        .lineLimit(1)
                 }
-                .padding(.horizontal, 14)
-                .padding(.vertical, 10)
-                .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.09) : Color.white.opacity(0.09), lineWidth: 1))
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(gameFg.opacity(0.35))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.06) : Color.white.opacity(0.08),
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(isAtmosLight ? Color(hex: "1A1A2E").opacity(0.09) : Color.white.opacity(0.09), lineWidth: 1))
+        }
+    }
+
+    // MARK: - Source Selector Sheet
+
+    private var sourceSelectorSheet: some View {
+        NavigationStack {
+            List {
+                Section {
+                    ForEach(ItemInputMode.allCases) { mode in
+                        Button {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
+                                viewModel.inputMode = mode
+                                viewModel.reset()
+                            }
+                            if mode == .directEntry {
+                                showSourceSelector = false
+                                Task {
+                                    try? await Task.sleep(nanoseconds: 400_000_000)
+                                    showDirectEntryEditor = true
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 14) {
+                                Image(systemName: mode == .savedList ? "list.bullet.clipboard" : "pencil")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(theme.primary)
+                                    .frame(width: 24)
+                                Text(lm.t(mode.labelKey))
+                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                if viewModel.inputMode == mode {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(theme.primary)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                if viewModel.inputMode == .savedList {
+                    Section(lm.t("draw.pickList")) {
+                        ForEach(lists) { list in
+                            Button {
+                                selectedList = list
+                                viewModel.reset()
+                                showSourceSelector = false
+                            } label: {
+                                HStack(spacing: 12) {
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                            .fill(theme.primary.opacity(0.12))
+                                            .frame(width: 36, height: 36)
+                                        if list.emoji.isEmpty {
+                                            Image(systemName: "list.bullet")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundStyle(theme.primary)
+                                        } else {
+                                            Text(list.emoji).font(.system(size: 20))
+                                        }
+                                    }
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(list.name)
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundStyle(.primary)
+                                        Text(list.items.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), list.items.count))
+                                            .font(.system(size: 13, design: .rounded))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    if list === selectedList {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(theme.primary)
+                                    }
+                                }
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                } else {
+                    Section {
+                        Button {
+                            showSourceSelector = false
+                            Task {
+                                try? await Task.sleep(nanoseconds: 400_000_000)
+                                showDirectEntryEditor = true
+                            }
+                        } label: {
+                            HStack {
+                                Text(lm.t("source.selector.editEntries"))
+                                    .font(.system(size: 16, design: .rounded))
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .navigationTitle(lm.t("source.selector.title"))
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(lm.t("button.close")) { showSourceSelector = false }
+                }
             }
         }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 
     // MARK: - Wheel Section
@@ -400,13 +508,7 @@ struct RouletteView: View {
             .frame(height: size)
             .offset(y: -20)
 
-            // Result overlay
-            if let result = viewModel.result {
-                resultCard(for: result)
-                    .transition(.scale(scale: 0.65).combined(with: .opacity))
-            }
         }
-        .animation(.spring(response: 0.45, dampingFraction: 0.72), value: viewModel.result != nil)
     }
 
     // MARK: - Frame Overlay
@@ -464,54 +566,6 @@ struct RouletteView: View {
         }
     }
 
-    // MARK: - Result Card
-
-    @ViewBuilder
-    private func resultCard(for result: String) -> some View {
-        VStack(spacing: 14) {
-            Text("🎉")
-                .font(.system(size: 44))
-            Text(result)
-                .font(.system(size: 26, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 12)
-                .shadow(color: .black.opacity(0.4), radius: 4)
-            HStack(spacing: 12) {
-                Button { viewModel.reset() } label: {
-                    Text(lm.t("button.again"))
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundStyle(viewModel.winnerColor.contrastingText)
-                        .padding(.horizontal, 24)
-                        .padding(.vertical, 10)
-                        .background(viewModel.winnerColor, in: Capsule())
-                        .shadow(color: viewModel.winnerColor.opacity(0.45), radius: 6, y: 3)
-                }
-            }
-            .padding(.top, 2)
-        }
-        .padding(.vertical, 26)
-        .padding(.horizontal, 30)
-        .background(
-            ZStack {
-                // Always-dark base — guarantees white text contrast regardless of winner color
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(Color.black.opacity(0.78))
-                // Subtle color tint from winner — visible but never overwhelms readability
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(LinearGradient(
-                        colors: [viewModel.winnerColor.opacity(0.35), viewModel.winnerColor.opacity(0.15)],
-                        startPoint: .topLeading, endPoint: .bottomTrailing
-                    ))
-                // Colored border echoes the winner color without lightening the card
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .stroke(viewModel.winnerColor.opacity(0.55), lineWidth: 1.5)
-            }
-        )
-        .innerHighlight(cornerRadius: 26, intensity: 0.12)
-        .shadow(color: viewModel.winnerColor.opacity(0.45), radius: 24, y: 10)
-        .shadow(color: .black.opacity(0.25), radius: 8, y: 4)
-    }
 
     // MARK: - Spin Button
 
@@ -519,24 +573,24 @@ struct RouletteView: View {
         Button {
             viewModel.spin(items: segments, palette: wheelColorStyle.colors, hapticsEnabled: hapticsEnabled, animationsReduced: appearance.animationsReduced)
         } label: {
-            HStack(spacing: 10) {
-                if viewModel.isSpinning {
-                    ProgressView().tint(.white).scaleEffect(0.85)
-                } else {
-                    Image(systemName: "arrow.clockwise.circle.fill")
-                        .font(.system(size: 20))
+            VStack(spacing: 8) {
+                ZStack {
+                    Circle()
+                        .fill(viewModel.isSpinning ? theme.primary.opacity(0.50) : theme.primary)
+                        .frame(width: 72, height: 72)
+                        .shadow(color: theme.primary.opacity(viewModel.isSpinning ? 0.1 : 0.45), radius: 16, y: 6)
+                    if viewModel.isSpinning {
+                        ProgressView().tint(theme.primary.contrastingText).scaleEffect(1.1)
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 26, weight: .semibold))
+                            .foregroundStyle(theme.primary.contrastingText)
+                    }
                 }
                 Text(viewModel.isSpinning ? lm.t("state.inProgress") : lm.t("roulette.spin"))
-                    .font(.system(size: 20, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(gameFg.opacity(0.55))
             }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 18)
-            .background(
-                viewModel.isSpinning ? theme.primary.opacity(0.50) : theme.primary,
-                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
-            )
-            .shadow(color: theme.primary.opacity(viewModel.isSpinning ? 0.12 : 0.40), radius: 12, y: 6)
         }
         .disabled(viewModel.isSpinning)
         .buttonStyle(.pressable)
@@ -570,89 +624,6 @@ struct RouletteView: View {
                 }
             }
         }
-    }
-
-    // MARK: - List Picker Sheet
-
-    private var listPickerSheet: some View {
-        NavigationStack {
-            List(lists) { list in
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack(spacing: 0) {
-                        Button {
-                            selectedList = list
-                            viewModel.reset()
-                            showListPicker = false
-                        } label: {
-                            HStack {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(list.name)
-                                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                                        .foregroundStyle(.primary)
-                                    Text(list.items.count == 1 ? lm.t("lists.item.singular") : String(format: lm.t("lists.item.plural"), list.items.count))
-                                        .font(.system(size: 13, design: .rounded))
-                                        .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                if list === selectedList {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundStyle(theme.primary)
-                                        .padding(.trailing, 8)
-                                }
-                            }
-                        }
-                        .buttonStyle(.plain)
-
-                        Button {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.75)) {
-                                if expandedListIDs.contains(list.id) {
-                                    expandedListIDs.remove(list.id)
-                                } else {
-                                    expandedListIDs.insert(list.id)
-                                }
-                            }
-                        } label: {
-                            Image(systemName: expandedListIDs.contains(list.id) ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.secondary)
-                                .padding(.vertical, 8)
-                                .padding(.leading, 12)
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    if expandedListIDs.contains(list.id) {
-                        let visibleItems = list.items.filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
-                        VStack(alignment: .leading, spacing: 5) {
-                            ForEach(visibleItems, id: \.self) { item in
-                                HStack(spacing: 8) {
-                                    Circle()
-                                        .fill(theme.primary.opacity(0.55))
-                                        .frame(width: 5, height: 5)
-                                    Text(item)
-                                        .font(.system(size: 14, design: .rounded))
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                        .padding(.top, 8)
-                        .padding(.bottom, 4)
-                        .padding(.leading, 2)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                    }
-                }
-            }
-            .navigationTitle(lm.t("draw.pickList"))
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(lm.t("button.close")) { showListPicker = false }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
     }
 
     // MARK: - Direct Entry Editor Sheet
@@ -768,15 +739,6 @@ struct WheelView: View {
                 path.closeSubpath()
                 context.fill(path, with: .color(colorStyle.colors[i % colorStyle.colors.count]))
 
-                var highlight = Path()
-                highlight.move(to: center)
-                highlight.addArc(center: center, radius: radius,
-                                 startAngle: .radians(startAngle),
-                                 endAngle: .radians(startAngle + segAngle * 0.18),
-                                 clockwise: false)
-                highlight.closeSubpath()
-                context.fill(highlight, with: .color(.white.opacity(0.1)))
-
                 var line = Path()
                 line.move(to: center)
                 line.addLine(to: CGPoint(
@@ -845,6 +807,69 @@ struct WheelView: View {
                 ? lm.t("wheel.a11y.empty")
                 : String(format: lm.t("wheel.a11y.options"), segments.count, segments.joined(separator: ", "))
         )
+    }
+}
+
+
+
+// MARK: - Result View
+
+struct RouletteResultView: View {
+    let result: String
+    let winnerColor: Color
+    var subtitle: String? = nil
+    let onAgain: () -> Void
+
+    @Environment(LanguageManager.self) private var lm
+    @State private var appeared = false
+
+    private var fg: Color { winnerColor.contrastingText }
+
+    var body: some View {
+        ZStack {
+            winnerColor
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                Spacer()
+
+                Text(result)
+                    .font(.system(size: 58, weight: .black, design: .rounded))
+                    .foregroundStyle(fg)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 28)
+                    .shadow(color: fg.opacity(0.15), radius: 6, y: 3)
+                    .scaleEffect(appeared ? 1 : 0.82)
+                    .opacity(appeared ? 1 : 0)
+
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.system(size: 15, design: .rounded))
+                        .foregroundStyle(fg.opacity(0.6))
+                        .padding(.top, 12)
+                        .opacity(appeared ? 1 : 0)
+                }
+
+                Spacer()
+
+                Button { onAgain() } label: {
+                    Text(lm.t("button.again"))
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(winnerColor)
+                        .padding(.horizontal, 36)
+                        .padding(.vertical, 14)
+                        .background(fg, in: Capsule())
+                }
+                .opacity(appeared ? 1 : 0)
+                .offset(y: appeared ? 0 : 16)
+                .padding(.bottom, 56)
+            }
+        }
+        .onAppear {
+            withAnimation(.spring(response: 0.45, dampingFraction: 0.72)) {
+                appeared = true
+            }
+        }
     }
 }
 

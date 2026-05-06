@@ -14,8 +14,8 @@ enum CoinSide: Equatable {
 
     var emoji: String {
         switch self {
-        case .heads: return "😎"
-        case .tails: return "🌟"
+        case .heads: return "👑"
+        case .tails: return "🛡️"
         }
     }
 }
