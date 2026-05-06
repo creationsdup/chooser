@@ -11,21 +11,24 @@ final class NumberRouletteViewModel {
     var targetDigits: [Int] = [0, 0, 0, 0]
 
     var rangeIsValid: Bool { minValue < maxValue }
+    private(set) var animationsReduced = false
 
-    func spin(hapticsEnabled: Bool) {
+    func spin(hapticsEnabled: Bool, animationsReduced: Bool = false) {
+        self.animationsReduced = animationsReduced
         guard !isSpinning, rangeIsValid else { return }
         isSpinning = true
 
         let target = Int.random(in: minValue...maxValue)
-        let s = String(format: "%04d", min(target, 9999))
-        targetDigits = s.compactMap { $0.wholeNumberValue }
+        let clamped = max(0, min(target, 9999))
+        let s = String(format: "%04d", clamped)
+        targetDigits = s.map { $0.wholeNumberValue ?? 0 }
 
         if hapticsEnabled { hapticImpact(.heavy) }
         spinTrigger += 1
 
-        // All 4 reels finish within ~3.8s (last reel delay 0.75 + animation ~3.0)
+        let finishDelay: Double = animationsReduced ? 0.4 : 4.2
         Task { @MainActor in
-            try? await Task.sleep(for: .seconds(4.2))
+            try? await Task.sleep(for: .seconds(finishDelay))
             self.isSpinning = false
             if hapticsEnabled { hapticSuccess() }
         }
@@ -131,6 +134,7 @@ struct NumberRouletteView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             .padding(.leading, 20)
 
             Spacer()
@@ -167,6 +171,7 @@ struct NumberRouletteView: View {
                 fieldTag: NumberField.min
             )
             .onChange(of: viewModel.minValue) { _, new in
+                if new < 0 { viewModel.minValue = 0 }
                 if new >= viewModel.maxValue { viewModel.maxValue = new + 1 }
             }
 
@@ -180,6 +185,7 @@ struct NumberRouletteView: View {
                 fieldTag: NumberField.max
             )
             .onChange(of: viewModel.maxValue) { _, new in
+                if new > 9999 { viewModel.maxValue = 9999 }
                 if new <= viewModel.minValue { viewModel.minValue = new - 1 }
             }
         }
@@ -194,6 +200,7 @@ struct NumberRouletteView: View {
             SlotMachineView(
                 targetDigits: viewModel.targetDigits,
                 spinTrigger: viewModel.spinTrigger,
+                animationsReduced: viewModel.animationsReduced,
                 numberColor: theme.primary,
                 numberColorEnd: theme.paletteColors.last ?? theme.primary.opacity(0.75)
             )
@@ -214,7 +221,7 @@ struct NumberRouletteView: View {
             // Animate the lever pull before spinning
             leverPulled = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { leverPulled = false }
-            viewModel.spin(hapticsEnabled: hapticsEnabled)
+            viewModel.spin(hapticsEnabled: hapticsEnabled, animationsReduced: appearance.animationsReduced)
         } label: {
             Text(viewModel.isSpinning ? lm.t("state.inProgress") : lm.t("button.start"))
                 .font(.system(size: 22, weight: .black, design: .rounded))
@@ -236,6 +243,7 @@ struct NumberRouletteView: View {
 struct SlotMachineView: View {
     let targetDigits: [Int]   // always 4 elements
     let spinTrigger: Int
+    var animationsReduced: Bool = false
     var numberColor: Color = Color(hex: "FF2D55")
     var numberColorEnd: Color = Color(hex: "FF6600")
 
@@ -278,6 +286,7 @@ struct SlotMachineView: View {
                         targetDigit: targetDigits[i],
                         spinTrigger: spinTrigger,
                         delay: Double(i) * 0.25,
+                        animationsReduced: animationsReduced,
                         numberColor: numberColor,
                         numberColorEnd: numberColorEnd
                     )
@@ -323,6 +332,7 @@ struct DigitReelView: View {
     let targetDigit: Int
     let spinTrigger: Int
     let delay: Double
+    var animationsReduced: Bool = false
     var numberColor: Color = Color(hex: "FF2D55")
     var numberColorEnd: Color = Color(hex: "FF6600")
 
@@ -401,7 +411,8 @@ struct DigitReelView: View {
         let finalOffset = normalizedOffset - CGFloat(totalSteps) * cellH
 
         // Cubic bezier: very fast scroll that brakes hard at the end
-        withAnimation(.timingCurve(0.12, 0.85, 0.25, 1.0, duration: 3.0)) {
+        let reelDuration = animationsReduced ? 0.15 : 3.0
+        withAnimation(.timingCurve(0.12, 0.85, 0.25, 1.0, duration: reelDuration)) {
             stripOffset = finalOffset
         }
     }

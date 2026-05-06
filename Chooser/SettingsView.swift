@@ -9,8 +9,6 @@ struct SettingsView: View {
     @State private var showResetConfirm = false
 
     var body: some View {
-        @Bindable var langMgr = lm
-
         Form {
             // ── Langue ────────────────────────────────────────────────────
             Section {

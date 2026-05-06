@@ -45,7 +45,7 @@ struct ListDetailView: View {
                     Button(role: .destructive) {
                         deleteItems(IndexSet(integer: index))
                     } label: {
-                        Label("Supprimer", systemImage: "trash")
+                        Label(lm.t("button.delete"), systemImage: "trash")
                     }
                 }
             }

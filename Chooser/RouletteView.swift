@@ -4,12 +4,12 @@ import SwiftData
 // MARK: - Frame Style
 
 enum WheelFrameStyle: String, CaseIterable, Identifiable {
-    case none    = "Aucun"
-    case simple  = "Simple"
-    case thick   = "Épais"
-    case glow    = "Lumineux"
-    case casino  = "Casino"
-    case premium = "Premium"
+    case none    = "none"
+    case simple  = "simple"
+    case thick   = "thick"
+    case glow    = "glow"
+    case casino  = "casino"
+    case premium = "premium"
 
     var id: String { rawValue }
 
@@ -51,7 +51,7 @@ final class RouletteViewModel {
 
     private var spinTask: Task<Void, Never>? = nil
 
-    func spin(items: [String], palette: [Color], hapticsEnabled: Bool) {
+    func spin(items: [String], palette: [Color], hapticsEnabled: Bool, animationsReduced: Bool = false) {
         guard !isSpinning, items.count >= 2 else { return }
         isSpinning = true
         result = nil
@@ -70,12 +70,14 @@ final class RouletteViewModel {
         winnerColor = palette[winnerIndex % palette.count]
         if hapticsEnabled { hapticImpact(.heavy) }
 
-        withAnimation(.timingCurve(0.17, 0.67, 0.12, 1.0, duration: 4.0)) {
+        let duration = animationsReduced ? 0.3 : 4.0
+        withAnimation(.timingCurve(0.17, 0.67, 0.12, 1.0, duration: duration)) {
             rotationAngle = targetAngle
         }
         let winner = items[winnerIndex]
+        let delay: Int = animationsReduced ? 350 : 4150
         spinTask = Task {
-            try? await Task.sleep(for: .milliseconds(4150))
+            try? await Task.sleep(for: .milliseconds(delay))
             guard !Task.isCancelled else { return }
             result = winner
             isSpinning = false
@@ -263,6 +265,7 @@ struct RouletteView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             Spacer()
             Text(lm.t("mode.roulette.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
@@ -514,7 +517,7 @@ struct RouletteView: View {
 
     private var spinButton: some View {
         Button {
-            viewModel.spin(items: segments, palette: wheelColorStyle.colors, hapticsEnabled: hapticsEnabled)
+            viewModel.spin(items: segments, palette: wheelColorStyle.colors, hapticsEnabled: hapticsEnabled, animationsReduced: appearance.animationsReduced)
         } label: {
             HStack(spacing: 10) {
                 if viewModel.isSpinning {
@@ -742,6 +745,7 @@ struct WheelView: View {
     let segments: [String]
     var centerColor: Color = Color(hex: "FF6B6B")
     var colorStyle: WheelColorStyle = .vivid
+    @Environment(LanguageManager.self) private var lm
 
     var body: some View {
         Canvas { context, size in
@@ -838,8 +842,8 @@ struct WheelView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(
             segments.isEmpty
-                ? "Roulette vide"
-                : "Roulette avec \(segments.count) options : \(segments.joined(separator: ", "))"
+                ? lm.t("wheel.a11y.empty")
+                : String(format: lm.t("wheel.a11y.options"), segments.count, segments.joined(separator: ", "))
         )
     }
 }

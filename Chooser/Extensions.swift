@@ -6,8 +6,8 @@ import UIKit
 // MARK: - Shared input mode
 
 enum ItemInputMode: String, CaseIterable, Identifiable {
-    case savedList   = "Liste"
-    case directEntry = "Saisie libre"
+    case savedList   = "savedList"
+    case directEntry = "directEntry"
     var id: String { rawValue }
 
     var labelKey: String {

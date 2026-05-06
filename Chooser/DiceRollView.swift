@@ -46,7 +46,7 @@ final class DiceViewModel {
         total = nil
     }
 
-    func roll(hapticsEnabled: Bool) {
+    func roll(hapticsEnabled: Bool, animationsReduced: Bool = false) {
         guard !isRolling else { return }
         isRolling = true
         total = nil
@@ -70,27 +70,32 @@ final class DiceViewModel {
             guard let self else { return }
             for i in 0..<count {
                 guard i < self.dice.count else { break }
-                let delay = Double(i) * 0.09
+                let delay = animationsReduced ? 0.0 : Double(i) * 0.09
 
                 let spinsX = Double(Int.random(in: 4...6))
                 let spinsY = Double(Int.random(in: 4...6))
 
-                // Phase 1: brief lift on launch
-                withAnimation(.easeOut(duration: 0.14).delay(delay)) {
-                    self.dice[i].scale = 1.12
-                }
-                // Phase 2: tumble + natural deceleration
-                // Always land at a multiple of 360° so the face is fully visible (not edge-on)
-                withAnimation(.easeOut(duration: 1.0).delay(delay + 0.10)) {
+                if !animationsReduced {
+                    // Phase 1: brief lift on launch
+                    withAnimation(.easeOut(duration: 0.14).delay(delay)) {
+                        self.dice[i].scale = 1.12
+                    }
+                    // Phase 2: tumble + natural deceleration
+                    // Always land at a multiple of 360° so the face is fully visible (not edge-on)
+                    withAnimation(.easeOut(duration: 1.0).delay(delay + 0.10)) {
+                        self.dice[i].rotX = spinsX * 360
+                        self.dice[i].rotY = spinsY * 360
+                        self.dice[i].scale = 1.0
+                    }
+                } else {
                     self.dice[i].rotX = spinsX * 360
                     self.dice[i].rotY = spinsY * 360
-                    self.dice[i].scale = 1.0
                 }
             }
         }
 
         // ── Phase 3: reveal result ───────────────────────────────────────────
-        let revealDelay = 1.25 + Double(count - 1) * 0.09
+        let revealDelay = animationsReduced ? 0.1 : 1.25 + Double(count - 1) * 0.09
         Task { @MainActor [weak self] in
             guard let self else { return }
             try? await Task.sleep(for: .milliseconds(Int(revealDelay * 1000)))
@@ -181,6 +186,7 @@ struct DiceRollView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             Spacer()
             Text(lm.t("mode.dice.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
@@ -224,7 +230,7 @@ struct DiceRollView: View {
             ForEach(Array(rows.enumerated()), id: \.offset) { _, row in
                 HStack(spacing: spacing) {
                     ForEach(row) { die in
-                        DieView(die: die, diceType: .d6)
+                        DieView(die: die, diceType: viewModel.diceType)
                     }
                 }
             }
@@ -272,7 +278,7 @@ struct DiceRollView: View {
     }
 
     private var rollButton: some View {
-        Button { viewModel.roll(hapticsEnabled: hapticsEnabled) } label: {
+        Button { viewModel.roll(hapticsEnabled: hapticsEnabled, animationsReduced: appearance.animationsReduced) } label: {
             Label(
                 viewModel.isRolling ? lm.t("dice.rolling") : lm.t("dice.roll"),
                 systemImage: viewModel.isRolling ? "hourglass" : "die.face.5.fill"

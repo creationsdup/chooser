@@ -30,7 +30,7 @@ final class CoinFlipViewModel {
     var isFlipping = false
     var result: CoinSide? = nil
 
-    func flip(hapticsEnabled: Bool) {
+    func flip(hapticsEnabled: Bool, animationsReduced: Bool = false) {
         guard !isFlipping else { return }
         isFlipping = true
         result = nil
@@ -38,6 +38,17 @@ final class CoinFlipViewModel {
         let winner: CoinSide = Int.random(in: 0...1) == 0 ? .heads : .tails
 
         if hapticsEnabled { hapticImpact(.heavy) }
+
+        if animationsReduced {
+            showingFront = winner == .heads
+            Task {
+                try? await Task.sleep(for: .milliseconds(120))
+                result = winner
+                isFlipping = false
+                if hapticsEnabled { hapticSuccess() }
+            }
+            return
+        }
 
         // Phase 1 — throw up with a fast spin
         withAnimation(.easeOut(duration: 0.55)) {
@@ -100,7 +111,7 @@ struct CoinFlipView: View {
         if viewModel.result != nil {
             viewModel.reset()
         } else {
-            viewModel.flip(hapticsEnabled: hapticsEnabled)
+            viewModel.flip(hapticsEnabled: hapticsEnabled, animationsReduced: appearance.animationsReduced)
         }
     }
 
@@ -190,6 +201,7 @@ struct CoinFlipView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             Spacer()
             Text(lm.t("mode.coinFlip.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))

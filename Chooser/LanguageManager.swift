@@ -74,7 +74,7 @@ private enum Translations {
                            "en": "Luck is in your hands"],
 
         // ── Home ──────────────────────────────────────────────────────────
-        "home.title":    ["fr": "Chooser", "en": "Chooser"],
+        "home.title":    ["fr": "Choozr", "en": "Choozr"],
         "home.subtitle": ["fr": "Quel jeu veux-tu jouer ?", "en": "What game do you want to play?"],
 
         // ── Picker modes — titles ─────────────────────────────────────────
@@ -204,8 +204,13 @@ private enum Translations {
         "button.again":  ["fr": "Recommencer","en": "Again"],
         "button.start":  ["fr": "Démarrer",   "en": "Start"],
         "button.done":   ["fr": "Terminé",    "en": "Done"],
-        "button.back":   ["fr": "Retour",     "en": "Back"],
-        "button.save":   ["fr": "Enregistrer","en": "Save"],
+        "button.back":     ["fr": "Retour",        "en": "Back"],
+        "button.save":     ["fr": "Enregistrer",  "en": "Save"],
+        "button.settings": ["fr": "Paramètres",   "en": "Settings"],
+        "storage.error.title":   ["fr": "Données temporaires",
+                                   "en": "Temporary storage"],
+        "storage.error.message": ["fr": "Vos listes ne peuvent pas être sauvegardées pour l'instant. Les données seront perdues à la fermeture de l'application.",
+                                   "en": "Your lists cannot be saved right now. Data will be lost when the app closes."],
 
         // ── Shared states ──────────────────────────────────────────────────
         "state.inProgress": ["fr": "En cours…",  "en": "In progress…"],
@@ -280,6 +285,8 @@ private enum Translations {
         "roulette.direct.enterItems": ["fr": "Saisir des éléments…",
                                        "en": "Enter items…"],
         "roulette.pickList":          ["fr": "Choisir une liste",  "en": "Pick a list"],
+        "wheel.a11y.empty":           ["fr": "Roulette vide",      "en": "Empty wheel"],
+        "wheel.a11y.options":         ["fr": "Roulette, %d options : %@", "en": "Wheel, %d options: %@"],
 
         // ── Weighted Roulette ──────────────────────────────────────────────
         "weighted.setup.title":      ["fr": "Combien d'options ?",   "en": "How many options?"],

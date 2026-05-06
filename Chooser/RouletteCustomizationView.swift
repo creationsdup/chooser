@@ -3,12 +3,12 @@ import SwiftUI
 // MARK: - Wheel Color Style
 
 enum WheelColorStyle: String, CaseIterable, Identifiable {
-    case vivid     = "Vif"
-    case pastel    = "Pastel"
-    case sombre    = "Sombre"
-    case neon      = "Néon"
-    case naturel   = "Naturel"
-    case arcEnCiel = "Arc-en-ciel"
+    case vivid     = "vivid"
+    case pastel    = "pastel"
+    case sombre    = "dark"
+    case neon      = "neon"
+    case naturel   = "natural"
+    case arcEnCiel = "rainbow"
 
     var id: String { rawValue }
 
@@ -73,11 +73,11 @@ enum WheelColorStyle: String, CaseIterable, Identifiable {
 // MARK: - Pointer Style
 
 enum PointerStyle: String, CaseIterable, Identifiable {
-    case pin      = "Épingle"
-    case arrow    = "Flèche"
-    case drop     = "Goutte"
-    case diamond  = "Losange"
-    case dart     = "Dard"
+    case pin      = "pin"
+    case arrow    = "arrow"
+    case drop     = "drop"
+    case diamond  = "diamond"
+    case dart     = "dart"
 
     var id: String { rawValue }
 

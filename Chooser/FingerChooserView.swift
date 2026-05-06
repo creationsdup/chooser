@@ -411,7 +411,7 @@ struct ConfettiBurstView: View {
                     offsetX: cos(angle) * dist,
                     offsetY: sin(angle) * dist,
                     rotation: Double.random(in: 0...360),
-                    color: colors.randomElement()!,
+                    color: colors.randomElement() ?? .white,
                     isRound: Bool.random()
                 )
             }
@@ -753,17 +753,6 @@ private struct CountdownFrameView: View {
     @State private var pulsing = false
     private let padding: CGFloat = 92
 
-    private var boundingRect: CGRect? {
-        guard !positions.isEmpty else { return nil }
-        let xs = positions.map(\.x)
-        let ys = positions.map(\.y)
-        let cx = (xs.min()! + xs.max()!) / 2
-        let cy = (ys.min()! + ys.max()!) / 2
-        let w = max(xs.max()! - xs.min()! + padding * 2, 130)
-        let h = max(ys.max()! - ys.min()! + padding * 2, 130)
-        return CGRect(x: cx - w / 2, y: cy - h / 2, width: w, height: h)
-    }
-
     var body: some View {
         EmptyView()
     }
@@ -862,6 +851,7 @@ struct FingerChooserView: View {
                                 .foregroundStyle(gameFg)
                         }
                     }
+                    .accessibilityLabel(lm.t("button.back"))
                     Spacer()
                 }
                 .padding(.horizontal, 20)

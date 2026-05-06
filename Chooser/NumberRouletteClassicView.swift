@@ -142,6 +142,7 @@ struct NumberRouletteClassicView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             Spacer()
             Text(lm.t("numberroulette.classic.title"))
                 .font(.system(size: 18, weight: .bold, design: .rounded))

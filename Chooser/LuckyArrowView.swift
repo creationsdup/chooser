@@ -169,6 +169,7 @@ struct LuckyArrowView: View {
             }
         }
         .onAppear {
+            guard !appearance.animationsReduced else { return }
             withAnimation(.easeInOut(duration: 2.6).repeatForever(autoreverses: true)) {
                 glowOpacity = 0.32
             }
@@ -266,6 +267,7 @@ struct LuckyArrowView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             .padding(.leading, 20)
 
             Spacer()

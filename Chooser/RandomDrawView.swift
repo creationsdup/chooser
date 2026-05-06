@@ -387,6 +387,7 @@ struct RandomDrawView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             Spacer()
             Text(lm.t("mode.randomDraw.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))

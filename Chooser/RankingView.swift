@@ -346,6 +346,7 @@ struct RankingView: View {
         }
         .sheet(isPresented: $showListPicker) { listPickerSheet }
         .sheet(isPresented: $showSaveSheet) { saveSheet }
+        .onDisappear { viewModel.reset() }
     }
 
     // MARK: - Portrait Layout
@@ -405,6 +406,7 @@ struct RankingView: View {
                         .foregroundStyle(gameFg)
                 }
             }
+            .accessibilityLabel(lm.t("button.back"))
             Spacer()
             Text(lm.t("mode.ranking.title"))
                 .font(.system(size: 20, weight: .bold, design: .rounded))

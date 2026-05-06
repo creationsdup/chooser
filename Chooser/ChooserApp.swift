@@ -94,7 +94,7 @@ struct SplashScreenView<Content: View>: View {
                         .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
                         .shadow(color: appearance.accent.opacity(0.4), radius: 20, x: 0, y: 8)
 
-                    Text("Chooser")
+                    Text("Choozr")
                         .font(.system(size: 42, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
 

@@ -6,7 +6,6 @@ struct PersonalizationView: View {
     @Environment(LanguageManager.self)    private var lm
     @Environment(AppearanceManager.self) private var appearance
 
-    @AppStorage("soundEnabled")   private var soundEnabled   = true
     @AppStorage("hapticsEnabled") private var hapticsEnabled = true
 
     var body: some View {
@@ -41,9 +40,6 @@ struct PersonalizationView: View {
 
             // ── Expérience ─────────────────────────────────────────────────
             Section {
-                Toggle(isOn: $soundEnabled) {
-                    Label(lm.t("settings.sound"), systemImage: "speaker.wave.2.fill")
-                }
                 Toggle(isOn: $hapticsEnabled) {
                     Label(lm.t("settings.haptics"), systemImage: "hand.tap.fill")
                 }

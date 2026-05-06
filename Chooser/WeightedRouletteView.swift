@@ -30,6 +30,7 @@ final class WeightedRouletteViewModel {
     var isSpinning = false
     var result: WeightedOption? = nil
     var winnerColor: Color = Color(hex: "FF6B6B")
+    private var spinTask: Task<Void, Never>?
 
     // Only options with weight > 0 participate in the draw and appear on the wheel
     var activeOptions: [WeightedOption] {
@@ -85,7 +86,7 @@ final class WeightedRouletteViewModel {
 
     // MARK: Weighted spin
 
-    func spin(palette: [Color], hapticsEnabled: Bool) {
+    func spin(palette: [Color], hapticsEnabled: Bool, animationsReduced: Bool = false) {
         let active = activeOptions
         guard !isSpinning, active.count >= 2 else { return }
         isSpinning = true
@@ -97,7 +98,7 @@ final class WeightedRouletteViewModel {
         // 2. Draw a uniform random in [0, total)
         var r = Double.random(in: 0..<total)
         // 3. Walk the cumulative distribution until we cross the draw value
-        var winner = active.last!
+        guard var winner = active.last else { isSpinning = false; return }
         for option in active {
             r -= option.weight
             if r < 0 {
@@ -137,17 +138,27 @@ final class WeightedRouletteViewModel {
 
         if hapticsEnabled { hapticImpact(.heavy) }
 
-        withAnimation(.timingCurve(0.17, 0.67, 0.12, 1.0, duration: 4.0)) {
+        let duration = animationsReduced ? 0.3 : 4.0
+        withAnimation(.timingCurve(0.17, 0.67, 0.12, 1.0, duration: duration)) {
             rotationAngle = targetAngle
         }
 
         let capturedWinner = winner
-        Task {
-            try? await Task.sleep(for: .milliseconds(4150))
-            result = capturedWinner
-            isSpinning = false
+        let delay: Int = animationsReduced ? 350 : 4150
+        spinTask?.cancel()
+        spinTask = Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(delay))
+            guard !Task.isCancelled else { return }
+            self.result = capturedWinner
+            self.isSpinning = false
             if hapticsEnabled { hapticSuccess() }
         }
+    }
+
+    func cancelSpin() {
+        spinTask?.cancel()
+        spinTask = nil
+        isSpinning = false
     }
 
     func resetOptions(count: Int) {
@@ -221,6 +232,7 @@ struct WeightedRouletteView: View {
                     .environment(\.appTheme, theme)
                     .environment(lm)
             }
+            .onDisappear { viewModel.cancelSpin() }
         }
     }
 
@@ -296,6 +308,7 @@ struct WeightedRouletteView: View {
                                 .foregroundStyle(gameFg)
                         }
                     }
+                    .accessibilityLabel(lm.t("button.back"))
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -834,7 +847,7 @@ struct WeightedRouletteView: View {
 
     private var spinButton: some View {
         Button {
-            viewModel.spin(palette: wheelColorStyle.colors, hapticsEnabled: hapticsEnabled)
+            viewModel.spin(palette: wheelColorStyle.colors, hapticsEnabled: hapticsEnabled, animationsReduced: appearance.animationsReduced)
         } label: {
             HStack(spacing: 10) {
                 if viewModel.isSpinning {
